@@ -15,7 +15,6 @@ export default class usersService {
 
     async createUser(firstName, lastName, age, email, password) {
         // try {
-        console.log(password);
 
 
         if (!firstName ||

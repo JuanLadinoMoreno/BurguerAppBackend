@@ -4,7 +4,8 @@ import { NOTES_APP_MONGODB_DATABASE, NOTES_APP_MONGODB_HOST } from './config.js'
 
 export const connectMDb = async () => {
 
-    const MONGODB_URI = `mongodb://${NOTES_APP_MONGODB_HOST}/${NOTES_APP_MONGODB_DATABASE}`
+    // const MONGODB_URI = `mongodb+srv://${NOTES_APP_MONGODB_HOST}/${NOTES_APP_MONGODB_DATABASE}`
+    const MONGODB_URI = `mongodb+srv://${NOTES_APP_MONGODB_HOST}${NOTES_APP_MONGODB_DATABASE}.8wuolks.mongodb.net`
 
     try {
         await mongoose.connect(MONGODB_URI);
