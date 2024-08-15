@@ -26,6 +26,8 @@ const app = express();
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
+app.use(express.static('public'))
+
 
 app.use(cors({
     // origin: 'http://127.0.0.1:5173',
