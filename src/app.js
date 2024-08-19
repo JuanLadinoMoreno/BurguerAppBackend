@@ -34,30 +34,31 @@ app.use(express.static('public'))
 // app.use(express.static(path.join(__dirname, 'public')));
 
 
+app.use(cors())
 // app.use(cors({
 //     // origin: 'http://127.0.0.1:5173',
 //     origin: '*',
 //     credentials: true
 // }))
 
-const allowedOrigins = [
-    'http://127.0.0.1:5173',  // Local
-    'http://localhost:5173',  // Local
-    'http://127.0.0.1:8080',  // Local
-    'http://localhost:8080',  // Local
-    'https://burguerappbackend.up.railway.app/'  // Producción
-];
+// const allowedOrigins = [
+//     'http://127.0.0.1:5173',  // Local
+//     'http://localhost:5173',  // Local
+//     'http://127.0.0.1:8080',  // Local
+//     'http://localhost:8080',  // Local
+//     'https://burguerappbackend.up.railway.app/'  // Producción
+// ];
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (allowedOrigins.includes(origin) || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-}));
+// app.use(cors({
+//     origin: (origin, callback) => {
+//         if (allowedOrigins.includes(origin) || !origin) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     credentials: true
+// }));
 
 
 app.use(cookieParser())
