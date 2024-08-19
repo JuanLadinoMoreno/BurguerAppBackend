@@ -49,7 +49,7 @@ export const login = async (req, res, next) => {
             // httpOnly: process.env.NODE_ENV !== "development",
             httpOnly: false,
             secure: true,
-            sameSite: "none",
+            sameSite: "lax",
         })
 
         res.status(200).json({

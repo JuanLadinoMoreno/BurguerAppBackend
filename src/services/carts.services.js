@@ -35,9 +35,10 @@ export class CartsService {
                 message: 'The user is not found',
                 code: ErrorCodes.NOT_FOUND
             })
-        }
-
-        const cartUsr = { ...cart, user: idUser }
+        }      
+        
+        const cartUsr = { ...cart, user: idUser, status: 'created' }       
+        
 
         const cartCreado = await cartsDAO.createCart(cartUsr)
         return cartCreado

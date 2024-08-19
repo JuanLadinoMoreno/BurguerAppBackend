@@ -5,8 +5,10 @@ import { NOTES_APP_MONGODB_DATABASE, NOTES_APP_MONGODB_HOST, URL_MONGO_DBATLAS }
 export const connectMDb = async () => {
 
     // const MONGODB_URI = `mongodb+srv://${NOTES_APP_MONGODB_HOST}/${NOTES_APP_MONGODB_DATABASE}`
+
     // const MONGODB_URI = `mongodb://localhost:27017/BurguerRobles`//local
     const MONGODB_URI = URL_MONGO_DBATLAS
+
     // const MONGODB_URI = `mongodb+srv://${NOTES_APP_MONGODB_HOST}${NOTES_APP_MONGODB_DATABASE}.8wuolks.mongodb.net`
 
     try {

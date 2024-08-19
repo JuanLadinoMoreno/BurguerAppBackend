@@ -29,11 +29,28 @@ app.use(express.json())
 app.use(express.static('public'))
 
 
+// app.use(cors({
+//     // origin: 'http://127.0.0.1:5173',
+//     origin: '*',
+//     credentials: true
+// }))
+
+const allowedOrigins = [
+    'http://127.0.0.1:5173',  // Local
+    'http://localhost:5173',  // Local
+    'https://tu-frontend.com'  // Producción
+];
+
 app.use(cors({
-    // origin: 'http://127.0.0.1:5173',
-    origin: 'http://localhost:5173',
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
-}))
+}));
 
 
 app.use(cookieParser())

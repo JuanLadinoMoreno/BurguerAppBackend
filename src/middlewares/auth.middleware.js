@@ -5,7 +5,7 @@ import { TOKEN_SECRET } from "../config/config.js";
 // verificacion con JWT
 export const authMdw = (req, res, next) => {
     try {      
-      const { token } = req.cookies;
+      const { token } = req.cookies;      
       // verifica que exista token
       if (!token)
         return res
