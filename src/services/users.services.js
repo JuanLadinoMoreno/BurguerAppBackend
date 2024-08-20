@@ -7,6 +7,7 @@ import { generateFindUserDataError, generateInvalidUserDataError } from "./error
 import ErrorCodes from "./errors/errorCodes.js";
 import { createAccessToken } from "../libs/jwts.js";
 import transport from "../config/emailTransport.js";
+import mongoose from "mongoose";
 
 const UsersDAO = new usersDAO();
 
@@ -108,34 +109,60 @@ export default class usersService {
 
 
     async findUserById(id) {
-        if (!id) {
+            if (!id) {
+                return CustomError.createError({
+                    name: 'User id error',
+                    cause: '',
+                    message: 'Verify user',
+                    code: ErrorCodes.IVALIT_CREDENTALS
+                })
+    
+            }
+    
+            const userFound = await UsersDAO.findUserById(id)
+    
+            if (!userFound) {
+                return CustomError.createError({
+                    name: 'User data error',
+                    cause: '',
+                    message: 'User not found',
+                    code: ErrorCodes.INVALID_CREDENTIALS
+                })
+            }
+    
+            const userDTO = new usersDto(userFound)
+            return userDTO
+    }
+
+    async updateUserById(id, user) {
+        const uid = new mongoose.Types.ObjectId(id)
+
+        const userFind = await this.findUserById(uid)
+        
+        // if(!userFind){
+
+        //     return CustomError.createError({
+        //         name: 'Product data error',
+        //         cause: '',
+        //         message: 'The product is not exists',
+        //         code: ErrorCodes.NOT_FOUND
+        //     })
+        // }
+        
+        const userUpd = await UsersDAO.updateUserById(uid, user)
+        
+        if(!userUpd)
             return CustomError.createError({
-                name: 'User id error',
+                name: 'Product update error',
                 cause: '',
-                message: 'Verify user',
-                code: ErrorCodes.IVALIT_CREDENTALS
+                message: 'The product can not be updated',
+                code: ErrorCodes.EXISTING_DATA
             })
-
-        }
-
-        const userFound = await UsersDAO.findUserById(id)
-
-        if (!userFound) {
-            return CustomError.createError({
-                name: 'User data error',
-                cause: '',
-                message: 'User not found',
-                code: ErrorCodes.INVALID_CREDENTIALS
-            })
-        }
-
-        const userDTO = new usersDto(userFound)
-        return userDTO
-
+        const userUpdDTO = new usersDto(userUpd)
+        return userUpdDTO
     }
 
     async getUsers() {
-
 
         const users = await UsersDAO.getUsers()
         return users

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authMdw } from "../middlewares/auth.middleware.js";
-import { dash, deleteUserInactive, getUsers, getUsersById, login, logout, notifyInactiveUsers, register, verifyToken } from "../controllers/session.controller.js";
+import { dash, deleteUserInactive, getUsers, getUsersById, login, logout, notifyInactiveUsers, register, updateUser, verifyToken } from "../controllers/session.controller.js";
 
 
 const router = Router()
@@ -23,6 +23,8 @@ router.get('/verify', verifyToken);
 router.get('/', getUsers)
 
 router.get('/:uid', getUsersById)
+
+router.put('/:uid', updateUser)
 
 router.delete('/:uid', deleteUserInactive)
 

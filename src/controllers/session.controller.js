@@ -97,7 +97,7 @@ export const dash = async (req, res, next) => {
             }
         });
 
-    } catch (error) {
+    } catch (error) {        
         next(error)
     }
 }
@@ -144,6 +144,20 @@ export const getUsersById = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         
+        next(error)
+    }
+}
+
+export const updateUser = async (req, res, next) => {
+    try {
+        const uid = req.params.uid
+        
+        // const pid = new mongoose.Types.ObjectId(productId)
+        const user = req.body
+        const userUpd = await usersService.updateUserById(uid, user);
+        
+        res.status(201).json({status: 'success', payload: userUpd})        
+    } catch (error) {
         next(error)
     }
 }

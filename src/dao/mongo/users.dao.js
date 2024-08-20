@@ -89,6 +89,18 @@ export default class usersDAO{
         }
     }
 
+    async updateUserById(id, user){
+        try {
+
+            if (!id || !user)  return null
+
+            return userModel.findByIdAndUpdate(id, { $set: user }, { returnDocument: 'after' })
+        } catch (error) {
+            console.log(error);
+            return null
+        }
+    }
+
     async getUsers() {
         try {
             const users = await userModel.find();
