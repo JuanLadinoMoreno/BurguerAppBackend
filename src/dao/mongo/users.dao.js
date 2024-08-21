@@ -120,5 +120,20 @@ export default class usersDAO{
         }
     }
 
+    async resetPassword(uid, password) {
+        try {
+            if (!uid || !password)  return null
+            
+            const hashedPassword = await bcryptjs.hash(password, 11);
+
+            return userModel.findByIdAndUpdate(uid, { password: hashedPassword }, { returnDocument: 'after' })
+
+        } catch (error) {
+            console.log(error);
+            return null
+            
+        }
+    }
+
 
 }

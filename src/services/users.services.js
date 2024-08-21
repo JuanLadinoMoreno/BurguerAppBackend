@@ -189,11 +189,11 @@ export default class usersService {
 
             await transport.sendMail({
                 from: 'juan',
-                to: user.email,
+                to: userFound.email,
                 subject: "No te has conectado en las últimas 24 horas",
                 html: `
                     <div>
-                        <p>Hola ${user.firstName},</p>
+                        <p>Hola ${userFound.firstName},</p>
                         <p>Notamos que no has iniciado sesión en la última hora. Si tienes algún problema, por favor contáctanos.</p>
                         <p>Saludos,</p>
                     </div>
@@ -216,5 +216,50 @@ export default class usersService {
         return await UsersDAO.deleteUserById(userId);
     }
 
+    async solicitudPaswordReset(email) {
+        const userFound = await UsersDAO.getUserByEmail(email)
+        if (!userFound) {
+            return CustomError.createError({
+                name: 'EmailError',
+                cause: '',
+                message: 'The email is not registered',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+
+        const token = await createAccessToken({ id: userFound.id }, '1d')
+
+        //ojo
+        const resetLink = `http://localhost:8080/reset-password`;
+
+        await transport.sendMail({
+            from: 'juan',
+            to: userFound.email,
+            subject: "Cambio de contraseña",
+            html: `
+                <div>
+                    <p>Hola ${userFound.firstName},</p>
+                    <p>Haga clic en el siguiente botón para restablecer su contraseña:</p>
+                    <a href="${resetLink}" >Restablecer contraseña</a>
+                </div>
+            `,
+            attachments: []
+            // attachments: [
+            //<img src='cid:meme1' /> esto va dentro del div para que salga la imagen
+
+            //     {
+            //         filename: 'meme.jpg',
+            //         path: `${__dirname}/images/meme.jpg`,
+            //         cid: 'meme1'
+            //     }
+            // ]
+        })
+        return token
+
+    }
+
+    async resetPassword(uid, password){
+        return await UsersDAO.resetPassword(uid, password)
+    }
 
 }

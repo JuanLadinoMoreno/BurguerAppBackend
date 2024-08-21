@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authMdw } from "../middlewares/auth.middleware.js";
-import { dash, deleteUserInactive, getUsers, getUsersById, login, logout, notifyInactiveUsers, register, updateUser, verifyToken } from "../controllers/session.controller.js";
+import { dash, deleteUserInactive, getUsers, getUsersById, login, logout, notifyInactiveUsers, register, resetPassword, solicitudPaswordReset, updateUser, verifyToken } from "../controllers/session.controller.js";
 
 
 const router = Router()
@@ -30,6 +30,10 @@ router.delete('/:uid', deleteUserInactive)
 
 router.delete('/', notifyInactiveUsers)
 
-
+//restableser conraseña
+//crea token y manda correo
+router.post('/req-reset-password', solicitudPaswordReset)
+//verifica token y actualiza contraseña
+router.post('/reset-password', resetPassword)
 
 export default router
