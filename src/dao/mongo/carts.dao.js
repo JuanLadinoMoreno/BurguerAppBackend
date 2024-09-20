@@ -26,7 +26,7 @@ export default class CartsManager {
 
     async getUserCarts(usrId) {
         try {
-            const carts = await cartModel.find({ user: usrId }).populate('products.pid')//.populate('user');
+            const carts = await cartModel.find({ user: usrId, status: "created" }).populate('products.pid').populate('user');
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');
             // console.log('datos', productos)
             // return datos
@@ -39,7 +39,7 @@ export default class CartsManager {
 
     async getCartById(id) {
         try {
-            const cart = await cartModel.findOne({ _id: id })//.populate('products.pid');
+            const cart = await cartModel.findOne({ _id: id }).populate('products.pid');
             // console.log('datos', productos)
             // return datos
             // return cart//.map(p => p.toObject({ virtuals: true }))            
@@ -99,6 +99,23 @@ export default class CartsManager {
 
         } catch (e) {
             console.log('Error al eliminar el carrito', e);
+            return null;
+        }
+    }
+
+    async UpdateCartById(cid, cart) {
+        // console.log('cartCreate', cart );
+        try {
+            // cart.products = []
+            // cart.status = 'empty'
+            // console.log('dao---------------->>', cart);
+
+            return cartModel.findByIdAndUpdate(cid, { $set: {products: cart} }, { returnDocument: 'after' })
+            // const empyCart = cart.save();
+            // return empyCart
+
+        } catch (error) {
+            console.log('Error al vaciar el carrito', e);
             return null;
         }
     }

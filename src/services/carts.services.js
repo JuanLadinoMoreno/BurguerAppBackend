@@ -130,6 +130,24 @@ export class CartsService {
 
     }
 
+        async UpdateCartById(cid, cart) { 
+
+        console.log('cart------ ', cart)
+        if (!cid || !cart) {
+            return CustomError.createError({
+                name: 'Cart data error',
+                cause: '',
+                message: `Error en los datos`,
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+        const cartCreado = await cartsDAO.UpdateCartById(cid, cart)
+        console.log('cartCreado------ ', cartCreado)
+        
+        return cartCreado
+
+    }
+
     async empyCart(cid) {
         if (!cid) {
             return CustomError.createError({

@@ -34,12 +34,12 @@ app.use(express.static('public'))
 // app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use(cors())
-// app.use(cors({
-//     // origin: 'http://127.0.0.1:5173',
-//     origin: '*',
-//     credentials: true
-// }))
+// app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:5173',
+    // origin: '*',
+    credentials: true
+}))
 
 // const allowedOrigins = [
 //     'http://127.0.0.1:5173',  // Local

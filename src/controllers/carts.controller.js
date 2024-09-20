@@ -80,6 +80,28 @@ export const getCartById = async (req, res, next) => {
     }
 }
 
+export const UpdateCartById = async (req, res, next) => {
+    
+    try {
+        // const usrId = new mongoose.Types.ObjectId(req.user.id)        
+        const {cart ,cid} = req.body
+        console.log('cart',cart);
+        console.log('cid', cid);
+        
+        
+        const cartUpdated = await cartsService.UpdateCartById(cid, cart)
+        
+        if(!cartUpdated){
+            return res.status(500).json({status: 'error', message: 'Error al actualizar carrito'})
+        }
+
+        res.status(201).json({status: 'succes', payload: cartUpdated})
+    } catch (error) {
+        next(error)
+    }
+
+}
+
 export const deleteCartById = async (req, res, next) => {
     try {
         const cartId = req.params.cid

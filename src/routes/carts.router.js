@@ -1,5 +1,5 @@
 import { Router} from "express";
-import { createCart, deleteCartById, deleteProductCart, getCartById, getAllCarts, updProductQuant, getUserCarts, finPurchase, empyCart, addProdororQuantToCart } from "../controllers/carts.controller.js";
+import { createCart, deleteCartById, deleteProductCart, getCartById, getAllCarts, updProductQuant, getUserCarts, finPurchase, empyCart, addProdororQuantToCart, UpdateCartById } from "../controllers/carts.controller.js";
 import { authMdw } from "../middlewares/auth.middleware.js";
 import { verifyAdminRoleMdw } from "../middlewares/verifyRole.middleware.js";
 
@@ -18,6 +18,9 @@ router.get('/:cid', authMdw, verifyAdminRoleMdw, getCartById)
 
 //Vaciar carrito
 router.put('/:cid', authMdw, empyCart)
+
+//Actualizar carrito
+router.put('/', authMdw, UpdateCartById)
 
 //Solo el ususario admin puede eliminar un carrito
 router.delete('/del/:cid', authMdw, verifyAdminRoleMdw, deleteCartById)
