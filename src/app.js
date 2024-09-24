@@ -9,6 +9,7 @@ import productsRouter from './routes/products.router.js'
 import categoriesRouter from './routes/categories.router.js'
 import cartsRouter from './routes/carts.router.js'
 import sessionRouter from './routes/session.router.js'
+import customersRouter from './routes/customer.router.js'
 
 import {errorHandler} from './middlewares/errors/index.js';
 
@@ -67,6 +68,7 @@ app.use('/api/products', productsRouter)
 app.use('/api/categories', categoriesRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/users', sessionRouter)
+app.use('/api/customers', customersRouter)
 
 app.use('*', (req, res) => {
     
