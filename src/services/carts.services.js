@@ -14,7 +14,7 @@ const usersService = new UsersService()
 
 export class CartsService {
 
-    async createCart(idUser, cart) {
+    async createCart(idUser, cart, customer, totalPrice) {
 
         // try {
         if (!idUser) {
@@ -26,6 +26,15 @@ export class CartsService {
             })
         }
 
+        // if (!customer) {
+        //     return CustomError.createError({
+        //         name: 'Customer data error',
+        //         cause: '',
+        //         message: 'Proporcione customer',
+        //         code: ErrorCodes.MISSING_REQUIRED_FIELDS
+        //     })
+        // }
+
 
         const findUser = await usersDAO.findUserById(idUser)
         if (!findUser) {
@@ -35,10 +44,51 @@ export class CartsService {
                 message: 'The user is not found',
                 code: ErrorCodes.NOT_FOUND
             })
-        }      
-        
-        const cartUsr = { ...cart, user: idUser, status: 'created' }       
-        
+        }
+
+        for (const product of cart.products) {
+            let productInStock = await productsDAO.findProductById(product.pid);
+
+
+            if (productInStock.stock < product.quantity) return CustomError.createError({
+                name: 'Cart data error',
+                cause: '',
+                // message: `Problema de stock ${productInStock.nombre}`,
+                // message: `La cantidad ordenada (${product.quantity}) supera el stock disponible(${productInStock.stock}) para el producto ${productInStock.nombre}.`,
+                message: `El producto ${productInStock.nombre} con cantidad ordenada (${product.quantity}) supera el stock disponible(${productInStock.stock}).`,
+                code: ErrorCodes.OUT_OF_STOCK
+            })
+
+            const newStock = productInStock.stock - product.quantity;
+            const prodUpdate = await productsDAO.updateStockQuantity(productInStock._id, product.quantity);
+            if (!prodUpdate) {
+                return CustomError.createError({
+                    name: 'Cart data error',
+                    cause: '',
+                    message: `Problema al actualizar catidad en producto`,
+                    code: ErrorCodes.NOT_FOUND
+                })
+            }
+
+            // if (productInStock.stock < product.quantity) {
+            //     insufficientStockProducts.push({
+            //         pid: product.pid,
+            //         quantity: product.quantity,
+            //         stock: productInStock.stock
+            //     });
+            // } else {
+            //     // prodsSell.push( product.pid)
+            //     prodsSell.push({ product: product.pid, quantity: product.quantity })
+            //     productInStock.stock -= product.quantity;
+            //     // await productInStock.save();
+            //     await cartsDAO.productInStockSave(productInStock)
+            //     cantiadTotal += product.quantity * productInStock.precio;
+            // }
+        }
+
+        const cartUsr = { ...cart, user: idUser, status: 'created', customer, totalPrice }
+
+
 
         const cartCreado = await cartsDAO.createCart(cartUsr)
         return cartCreado
@@ -47,23 +97,9 @@ export class CartsService {
 
 
     async getAllCarts() {
-        
-        const carts = await cartsDAO.getCarts()
-        if(!carts)
-            return CustomError.createError({
-                name: 'User data error',
-                cause: '',
-                message: 'The user is not found',
-                code: ErrorCodes.NOT_FOUND
-            })
-        return carts       
-    }
 
-    async getUserCarts(uid) {
-       
-        await usersService.findUserById(uid)
-        const carts = await cartsDAO.getUserCarts(uid)
-        if(!carts)
+        const carts = await cartsDAO.getCarts()
+        if (!carts)
             return CustomError.createError({
                 name: 'User data error',
                 cause: '',
@@ -71,12 +107,26 @@ export class CartsService {
                 code: ErrorCodes.NOT_FOUND
             })
         return carts
-        
+    }
+
+    async getUserCarts(uid) {
+
+        const user = await usersService.findUserById(uid)
+        if (!user)
+            return CustomError.createError({
+                name: 'User data error',
+                cause: '',
+                message: 'The user is not found',
+                code: ErrorCodes.NOT_FOUND
+            })
+        const carts = await cartsDAO.getUserCarts(uid)
+        return carts
+
 
     }
 
     async getCartById(cid) {
-        
+
         const cart = await cartsDAO.getCartById(cid)
         if (!cart) {
             return CustomError.createError({
@@ -87,11 +137,11 @@ export class CartsService {
             })
         }
         return cart
-        
+
     }
 
     async deleteCartById(cid) {
-        
+
         // Verificar que el ID del carrito no esté vacío
         if (!cid) {
             return CustomError.createError({
@@ -126,13 +176,12 @@ export class CartsService {
 
         return cartDel;
 
-        
+
 
     }
 
-        async UpdateCartById(cid, cart) { 
+    async UpdateCartById(cid, cart, totalPrice) {
 
-        console.log('cart------ ', cart)
         if (!cid || !cart) {
             return CustomError.createError({
                 name: 'Cart data error',
@@ -141,10 +190,111 @@ export class CartsService {
                 code: ErrorCodes.NOT_FOUND
             })
         }
-        const cartCreado = await cartsDAO.UpdateCartById(cid, cart)
-        console.log('cartCreado------ ', cartCreado)
-        
-        return cartCreado
+
+        //Obtiene carrito de la bd
+        const existingCart = await cartsDAO.getCartById(cid)
+        if (!existingCart) {
+            return CustomError.createError({
+                name: 'Cart data error',
+                cause: '',
+                message: `Carrito no encontrado`,
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+
+        for (const product of cart) {
+            // let productInStock = await productsDAO.findProductByIdd(product.pid);
+
+
+            // Buscar un producto coincidente en pid y propiedades adicionales
+            const existingProduct = existingCart.products.find(p =>
+                p.pid._id.toString() === product.pid &&
+                (p.size?.id === product.size?.id) && //verifica que exista size ? y sea igual a id del productd ===
+                (p.selectedRevolcado?.id === product.selectedRevolcado?.id) && //verifica que exista selectedRevolcado ? y sea igual a id del productd ===
+                JSON.stringify(p.ingredientesExtra) === JSON.stringify(product.ingredientesExtra)
+                // p.quantity !== product.quantity
+            );
+
+
+            // Si existe y coincide en propiedades, sumar cantidad adicional
+            if (existingProduct) {
+
+
+                if (existingProduct.quantity === product.quantity) {
+                    //con cantidades iguales significa que si son objetos iguales, es decir que no se modifico en la orde
+                    //por eso no hace nada y se pasa al siguiente
+                    continue;
+                }
+
+                const calQuantity = existingCart.products.find(( prod ) => {
+                    if (prod.pid._id.toString() === product.pid) {
+    
+                         const quant = product.quantity - prod.quantity
+                    }
+                });
+                
+                const additionalQuantity = product.quantity - existingProduct.quantity;
+
+                // Validar stock para la cantidad adicional
+                const stockCheck = await productsDAO.findProductByIdd(product.pid);
+
+                if (stockCheck.stock < additionalQuantity) {
+                    return CustomError.createError({
+                        name: 'Cart update error',
+                        cause: '',
+                        message: `No hay suficiente stock para ${stockCheck.nombre}.`,
+                        code: ErrorCodes.OUT_OF_STOCK
+                    });
+                }
+
+                // Actualizar cantidad y reducir el stock
+                const newStock = stockCheck.stock - additionalQuantity;
+
+                const prodUpdate = await productsDAO.updateStock(stockCheck._id, newStock);
+                if (!prodUpdate) {
+                    return CustomError.createError({
+                        name: 'Cart data error',
+                        cause: '',
+                        message: `Problema al actualizar catidad en producto`,
+                        code: ErrorCodes.NOT_FOUND
+                    })
+                }
+            } else {
+                // Si no coincide en propiedades, agregar como nuevo producto
+                const stockCheck = await productsDAO.findProductById(product.pid);
+                if (stockCheck.stock < product.quantity) {
+                    return CustomError.createError({
+                        name: 'Cart update error',
+                        cause: '',
+                        message: `No hay suficiente stock para ${stockCheck.nombre}.`,
+                        code: ErrorCodes.OUT_OF_STOCK
+                    });
+                }
+
+                // Añadir al carrito y deducir stock
+                const newStock = stockCheck.stock - product.quantity;
+
+                const prodUpdate = await productsDAO.updateStockQuantity(stockCheck._id, product.quantity);
+                if (!prodUpdate) {
+                    return CustomError.createError({
+                        name: 'Cart data error',
+                        cause: '',
+                        message: `Problema al actualizar catidad en producto`,
+                        code: ErrorCodes.NOT_FOUND
+                    })
+                }
+                // Añadir al carrito
+                // existingCart.products.push(product);
+            }
+
+        }
+
+
+        const updateCart = await cartsDAO.UpdateCartById(cid, cart, totalPrice)
+        // const updateCart = await cartsDAO.UpdateCartById(cid, existingCart)
+        // console.log('updateCart------ ', updateCart)
+
+        return updateCart
 
     }
 
@@ -187,7 +337,7 @@ export class CartsService {
     }
 
     async addProductToCart(cid, pid, quantity) {
-        
+
         //verifica que el producto y el carrito existan
         const carFind = await cartsDAO.getCartByIdStatusCreated(cid);
         const productFind = await productsDAO.findProductById(pid);
@@ -292,10 +442,7 @@ export class CartsService {
 
     async finalizePurchase(cid, uid) {
         // try {
-        const insufficientStockProducts = [];
-        let cantiadTotal = 0;
-        let productInStock = null
-        let prodsSell = []
+        
         // Verifica que el carrito exista y sea del usuario logeado
         // const cart = await cartModel.findOne({ _id: cid, user: uid, status: 'created' }).populate('products.pid');
         const cart = await cartsDAO.verifyCartOfUser(cid, uid)
@@ -307,63 +454,23 @@ export class CartsService {
                 code: ErrorCodes.INVALID_CREDENTIALS
             })
 
-        for (const product of cart.products) {
-            productInStock = await productsDAO.findProductByIdd(product.pid);
-
-            if (productInStock.stock < product.quantity) {
-                insufficientStockProducts.push({
-                    pid: product.pid,
-                    quantity: product.quantity,
-                    stock: productInStock.stock
-                });
-            } else {
-                // prodsSell.push( product.pid)
-                prodsSell.push({ product: product.pid, quantity: product.quantity })
-                productInStock.stock -= product.quantity;
-                // await productInStock.save();
-                await cartsDAO.productInStockSave(productInStock)
-                cantiadTotal += product.quantity * productInStock.precio;
-            }
-        }
-
-        // if (insufficientStockProducts.length > 0) {
-        // //   return {       ///OJO Como mandar el error de
-        // //     message: 'Algunos productos no tienen suficiente stock.',
-        // //     cart,
-        // //     insufficientxStockProducts
-        // //   };
-        // return null
-        // } else {        
-
-        // const updatedCart = await cartModel.findByIdAndUpdate(
-        //     cid,
-        //     { status: 'finalized' },
-        //     { new: true }
-        // );
+        // for (const product of cart.products) {
+        //     productInStock = await productsDAO.findProductByIdd(product.pid);
+        //     console.log('productInStock.stock < product.quantity', productInStock.stock, product.quantity);
 
 
-        //Guarda el cart los productos sin stock
-        cart.products = insufficientStockProducts.map(p => ({
-            pid: p.pid,
-            quantity: p.quantity
-        }));
-
-        // await cart.save();
-
-
-        //   const usrId = new mongoose.Types.ObjectId(uid)
-        // const usrEmail = await userModel.findById(uid)
-        const usrEmail = await usersDAO.findUserById(uid)
-        if (!usrEmail)
-            return CustomError.createError({
-                name: 'Cart data error',
-                cause: '',
-                message: 'The user is not exists in the cart',
-                code: ErrorCodes.INVALID_CREDENTIALS
-            })
-
+        //     if (productInStock.stock < product.quantity) return CustomError.createError({
+        //         name: 'Cart data error',
+        //         cause: '',
+        //         message: `Verificar el stock del producto ${productInStock.nombre}`,
+        //         code: ErrorCodes.INVALID_CREDENTIALS
+        //     })
+        // }
+        
         //Crae tiket en BD
-        const ticket = cartsDAO.saveTicket(cantiadTotal, usrEmail.email, cart.user._id, cid, prodsSell)
+        const customer = !cart.customer ? null : cart.customer._id
+        const ticket = cartsDAO.saveTicket(cart.user._id, customer, cid, cart.products, cart.totalPrice)
+        // uid, customer, cid, productsSell, cantidadTotal
         if (!ticket)
             return CustomError.createError({
                 name: 'Cart data error',
@@ -383,14 +490,7 @@ export class CartsService {
             })
 
         await cartsDAO.cartSave(cart) //Guarda en BD
-        //   await productInStock.save();
-
-        // return {
-        //     message: 'Purchase finalized successfully.',
-        //     cart: updatedCart,
-        //     ticket,
-        //     insufficientStockProducts
-        // };
+        
         return ticket
         // }
 

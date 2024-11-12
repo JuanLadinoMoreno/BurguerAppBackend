@@ -2,7 +2,23 @@
 // const { default: mongoose } = require("mongoose")
 import mongoose, { Schema, model } from 'mongoose';
 
+// Subesquema para tamaños
+const sizesSchema = new Schema({
+    nombre: { type: String, required: true },
+    precio: { type: Number, required: true }
+});
 
+// Subesquema para ingredientes extra
+const IngredienteExtraSchema = new Schema({
+    nombre: { type: String, required: true },
+    precio: { type: Number, required: true }
+});
+
+// Subesquema para revolcado
+const IngredienteRevolcadoSchema = new Schema({
+    nombre: { type: String, required: true },
+    precio: { type: Number, required: true }
+});
 
 
 
@@ -31,13 +47,6 @@ const prodSchema = new Schema({
         // unique: true
     },
 
-
-    ingrePrep: {
-        type: String,
-        required: true,
-        // unique: true
-    },
-
     pan: {
         type: String,
         required: true,
@@ -46,6 +55,12 @@ const prodSchema = new Schema({
 
     precio: {
         type: Number,
+        required: true,
+        // unique: true
+    },
+
+    categoria: {
+        type: String,
         required: true,
         // unique: true
     },
@@ -72,6 +87,18 @@ const prodSchema = new Schema({
         required: true,
         // unique: true
     },
+
+    tipoRevolcado: {
+        type: Boolean,
+        default: false
+    },
+
+    ingredientesExtra: [IngredienteExtraSchema],
+
+    ingredientesRevolcado: [IngredienteRevolcadoSchema],
+
+    tamanos: [sizesSchema],
+
     user: {
         type: mongoose.Types.ObjectId,
         ref: 'User'

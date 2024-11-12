@@ -22,16 +22,18 @@ export const createCart = async (req, res, next) => {
     
     try {
         const usrId = new mongoose.Types.ObjectId(req.user.id)        
-        const cart = req.body
+        // const cart = req.body
         
-        const cartCreado = await cartsService.createCart(usrId, cart)
+        const {products, customer, totalPrice} = req.body
+        
+        const cartCreado = await cartsService.createCart(usrId, { products }, customer, totalPrice)
         
         if(!cartCreado){
             res.status(500).json({status: 'error', message: 'Error al crear producto'})
         }
 
         res.status(201).json({status: 'succes', payload: cartCreado})
-    } catch (error) {
+    } catch (error) {       
         next(error)
     }
 
@@ -84,19 +86,17 @@ export const UpdateCartById = async (req, res, next) => {
     
     try {
         // const usrId = new mongoose.Types.ObjectId(req.user.id)        
-        const {cart ,cid} = req.body
-        console.log('cart',cart);
-        console.log('cid', cid);
+        const {cart ,cid, totalPrice} = req.body
         
         
-        const cartUpdated = await cartsService.UpdateCartById(cid, cart)
+        const cartUpdated = await cartsService.UpdateCartById(cid, cart, totalPrice)
         
         if(!cartUpdated){
             return res.status(500).json({status: 'error', message: 'Error al actualizar carrito'})
         }
 
         res.status(201).json({status: 'succes', payload: cartUpdated})
-    } catch (error) {
+    } catch (error) {        
         next(error)
     }
 
@@ -145,7 +145,6 @@ export const addProdororQuantToCart = async (req, res, next) => {
 
         res.status(201).json({ status: 'success', payload: prodCreado})
     } catch (error) {
-        console.log(error);
         next(error)
     }
 
@@ -158,7 +157,6 @@ export const updProductQuant = async (req, res) => {
 
         const { quantity } = req.body
 
-        console.log(cart, product);
         const prodCreado = await cartsManager.updQuantToProduct(cart, product, quantity)
         if (!prodCreado) return res.status(500).json({ message: 'error,producto o carrito no encontrado' })
 
@@ -179,7 +177,6 @@ export const deleteProductCart = async (req, res, next) => {
 
         res.status(200).json({status: 'error', payload: prodCreado})
     } catch (error) {
-        console.log(error);
         next(error)        
     }
 
@@ -197,7 +194,6 @@ export const finPurchase = async (req, res, next) => {
          res.status(200).json({ status: 'seccess', payload: ticket })
 
     }catch(error){
-        console.log(error);
         next(error)
     }
 }

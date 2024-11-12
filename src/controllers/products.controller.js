@@ -55,7 +55,7 @@ export const editProduct = async (req, res, next) => {
         const product = req.body
         const prodUpd = await productService.updateOne(pid, product);
         
-        res.status(201).json({status: 'success', payload: prodUpd})        
+        res.status(200).json({status: 'success', payload: prodUpd})        
     } catch (error) {
         next(error)
     }

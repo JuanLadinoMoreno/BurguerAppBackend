@@ -13,7 +13,7 @@ export default class CartsManager {
 
     async getCarts() {
         try {
-            const carts = await cartModel.find().populate('products.pid')//.populate('user');
+            const carts = await cartModel.find().populate('products.pid').populate('customer');
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');
             // console.log('datos', productos)
             // return datos
@@ -26,7 +26,7 @@ export default class CartsManager {
 
     async getUserCarts(usrId) {
         try {
-            const carts = await cartModel.find({ user: usrId, status: "created" }).populate('products.pid').populate('user');
+            const carts = await cartModel.find({ user: usrId, status: "created" }).populate('products.pid').populate('user').populate('customer').sort({createdAt: -1})
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');
             // console.log('datos', productos)
             // return datos
@@ -103,14 +103,13 @@ export default class CartsManager {
         }
     }
 
-    async UpdateCartById(cid, cart) {
-        // console.log('cartCreate', cart );
+    async UpdateCartById(cid, cart, totalPrice) {
         try {
             // cart.products = []
             // cart.status = 'empty'
             // console.log('dao---------------->>', cart);
 
-            return cartModel.findByIdAndUpdate(cid, { $set: {products: cart} }, { returnDocument: 'after' })
+            return cartModel.findByIdAndUpdate(cid, { $set: {products: cart, totalPrice} }, { returnDocument: 'after' })
             // const empyCart = cart.save();
             // return empyCart
 
@@ -124,7 +123,6 @@ export default class CartsManager {
         try {
             cart.products = []
             cart.status = 'empty'
-            console.log('dao---------------->>', cart);
 
             return cartModel.findByIdAndUpdate(cid, { $set: cart }, { returnDocument: 'after' })
             // const empyCart = cart.save();
@@ -255,7 +253,7 @@ export default class CartsManager {
 
     async verifyCartOfUser(cid, uid) {
         try {
-            // Verifica que el carrito exista y sea del usuario logeado
+            // Verifica que el carrito exista y sea del usuario logeado            
             const cart = await cartModel.findOne({ _id: cid, user: uid, status: 'created' }).populate('products.pid');
             return cart
         } catch (error) {
@@ -302,15 +300,16 @@ export default class CartsManager {
         }
     }
 
-    async saveTicket(cantiadTotal, userEmail, uid, cid, productsSell) {
+    async saveTicket(uid, customer, cid, productsSell, cantidadTotal) {
         try {
             const tiket = new ticketModel({
                 code: nanoid(6), // Generar un código único para la compra
-                amount: cantiadTotal,
-                purchaser: userEmail, // Suponiendo que el usuario tiene un campo `email`
                 user: uid,
+                customer,
                 cart: cid,
-                productsSell
+                productsSell,
+                amount: cantidadTotal,
+                // purchaser: userEmail // Suponiendo que el usuario tiene un campo `email`
             });
     
            return await tiket.save();

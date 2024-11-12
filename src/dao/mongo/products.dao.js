@@ -113,10 +113,29 @@ export default class productsDAO {
     async getCategories(){
         try {
             const categories = await  categoriesModel.find();
+            // const categories = await  categoriesModel.find().sort({nombre: 1});
             return categories.map(p => p.toObject())
             
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    async updateStock(pid, quantity){
+        try {
+            return productModel.findByIdAndUpdate(pid, { $set: {stock: quantity} }, { new: true }) 
+        } catch (error) {
+            console.log(error)
+            throw new Error("No se pudo actualizar el stock del producto.");
+        }
+    }
+
+    async updateStockQuantity(pid, quantity){
+        try {
+            return productModel.findByIdAndUpdate(pid, { $inc: {stock: -quantity} }, { new: true }) 
+        } catch (error) {
+            console.log(error)
+            throw new Error("No se pudo actualizar el stock del producto.");
         }
     }
 

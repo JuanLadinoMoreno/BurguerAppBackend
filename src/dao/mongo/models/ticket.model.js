@@ -7,37 +7,47 @@ const ticketSchema = new Schema(
             unique: true,
             required: true,
         },
-        amount: {
-            type: Number,
-            required: true
-        },
-        purchaser: {
-            type: String,
-            required: true
-        },
+        // purchaser: {
+        //     type: String,
+        //     required: true
+        // },
         user: {
             type: mongoose.Types.ObjectId,
             ref: 'User',
             required: true
+        },
+        customer: {
+            // type: String,
+            type: mongoose.Types.ObjectId,
+            ref:'Customer',
+            // required: true
         },
         cart: {
             type: mongoose.Types.ObjectId,
             ref: 'Carts',
             required: true
         },
-        productsSell: [
-            {
-                product: {
-                    type: mongoose.Types.ObjectId,
-                    ref: 'Product',
-                    required: true
-                },
-                quantity: {
-                    type: Number,
-                    required: true
-                }
-            }
-        ]
+        productsSell: {
+            type: [],
+            required: true
+        },
+        // productsSell: [
+        //     {
+        //         product: {
+        //             type: mongoose.Types.ObjectId,
+        //             ref: 'Product',
+        //             required: true
+        //         },
+        //         quantity: {
+        //             type: Number,
+        //             required: true
+        //         }
+        //     }
+        // ],
+        amount: {
+            type: Number,
+            required: true
+        },
         // purchase_datetime: {
         //     type: String,
         //     default: Date.now
