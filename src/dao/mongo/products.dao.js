@@ -139,4 +139,13 @@ export default class productsDAO {
         }
     }
 
+    async updateAddStockQuantity(pid, quantity){
+        try {
+            return productModel.findByIdAndUpdate(pid, { $inc: {stock: quantity} }, { new: true }) 
+        } catch (error) {
+            console.log(error)
+            throw new Error("No se pudo actualizar el stock del producto.");
+        }
+    }
+
 }

@@ -226,6 +226,22 @@ export class CartsService {
                     continue;
                 }
 
+                if (product.quantity < existingProduct.quantity) {
+                    // Validar stock para la cantidad adicional
+                    const stockCheck = await productsDAO.findProductByIdd(product.pid);
+                    const dif = existingProduct.quantity - product.quantity
+                    const prodUpdate = await productsDAO.updateAddStockQuantity(stockCheck._id, dif);
+                    if (!prodUpdate) {
+                        return CustomError.createError({
+                            name: 'Cart data error',
+                            cause: '',
+                            message: `Problema al actualizar catidad en producto`,
+                            code: ErrorCodes.NOT_FOUND
+                        })
+                    }
+                    continue;
+                }
+
                 const calQuantity = existingCart.products.find(( prod ) => {
                     if (prod.pid._id.toString() === product.pid) {
     
@@ -272,8 +288,6 @@ export class CartsService {
                 }
 
                 // Añadir al carrito y deducir stock
-                const newStock = stockCheck.stock - product.quantity;
-
                 const prodUpdate = await productsDAO.updateStockQuantity(stockCheck._id, product.quantity);
                 if (!prodUpdate) {
                     return CustomError.createError({
