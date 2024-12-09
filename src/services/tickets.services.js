@@ -53,6 +53,22 @@ export default class TicketsServices{
         return tickets
     
     }
+    
+    async getSalesForMonth() {
+    
+        const tickets = await ticketsDAO.getSalesForMonth()
+        if (!tickets) {
+            return CustomError.createError({
+                name: 'Tickets Problem',
+                cause: '',
+                message: 'Problem to get sales for month',
+                code: ErrorCodes.NOT_FOUND
+            })
+
+        }
+        return tickets
+    
+    }
 
 
 }

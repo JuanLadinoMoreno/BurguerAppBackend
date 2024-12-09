@@ -84,4 +84,44 @@ export default class TicketsDAO {
         }
     }
 
+    async getSalesForMonth(){
+        try {
+            const sales = await ticketModel.aggregate([
+ 
+                {
+                  $group: {
+                    _id: { $month: "$purchase_datetime" }, // Agrupar por mes
+                    totalSales: { $sum: "$amount" } // Sumar el monto total de ventas
+                  }
+                },
+                {
+                  $sort: { _id: 1 } // Ordenar por mes
+                },
+                {
+                  $project: {
+                    month: {
+                      $let: {
+                        vars: {
+                          monthsInYear: [
+                            "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+                            "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
+                          ]
+                        },
+                        in: { $arrayElemAt: ["$$monthsInYear", { $subtract: ["$_id", 1] }] }
+                      }
+                    },
+                    sales: "$totalSales",
+                    _id: 0 // Eliminar `_id` del resultado final
+                  }
+                }
+              ]);
+
+              return sales;
+
+        } catch (error) {
+            console.log('Error on get sales fom month', error);
+            return null
+        }
+    }
+
 }

@@ -40,3 +40,16 @@ export const getSalesFromYear = async (req, res, next) => {
         next(error)
     }
 }
+
+export const getSalesForMonth = async (req, res, next) => {
+    try {
+        const sales = await ticketsServices.getSalesForMonth();
+        if(!sales) return res.json({status: 'error', message: 'Sales null'})
+
+        res.status(200).json({ status: 'success', payload: sales })
+    } catch (error) {
+        console.log(error);
+
+        next(error)
+    }
+}
