@@ -124,4 +124,123 @@ export default class TicketsDAO {
         }
     }
 
+    async getSalesForCategoryMonth( tipo ){
+        try {
+            const sales = await ticketModel.aggregate([
+
+                [
+                    {
+                      $unwind: "$productsSell"
+                    },
+                    {
+                      $lookup: {
+                        from: "products",
+                        // Nombre de la colección de productos
+                        localField: "productsSell.pid",
+                        // Campo de referencia en tickets
+                        foreignField: "_id",
+                        // Campo de referencia en productos
+                        as: "productDetails" // Nombre del array con los datos del producto
+                      }
+                    },
+                    {
+                      $unwind: "$productDetails"
+                    },
+                    {
+                      $match: {
+                        "productDetails.tipo": tipo
+                      }
+                    },
+                    {
+                      $addFields:
+                        /**
+                         * newField: The new field name.
+                         * expression: The new field expression.
+                         */
+                        {
+                          "productsSell.totalPrice": {
+                            $multiply: [
+                              {
+                                $sum: [
+                                  "$productDetails.precio",
+                                  // Precio base del producto
+                                  {
+                                    $sum: "$productsSell.ingredientesExtra.precio"
+                                  },
+                                  // Suma de ingredientes extras
+                                  "$productsSell.size.precio",
+                                  // Precio del tamaño
+                                  "$productsSell.selectedRevolcado.precio" // Precio del revolcado seleccionado
+                                ]
+                              },
+                              "$productsSell.quantity" // Multiplicar por la cantidad
+                            ]
+                          }
+                        }
+                    },
+                    {
+                      $group:
+                        /**
+                         * _id: The id of the group.
+                         * fieldN: The first field name.
+                         */
+                        {
+                          _id: {
+                            month: {
+                              $month: "$purchase_datetime"
+                            } // Agrupar por mes
+                          },
+                          totalSales: {
+                            $sum: "$productsSell.totalPrice"
+                          } // Sumar las ventas
+                          // totalSales: { $sum: "$amount" } // Sumar el monto total de ventas por mes
+                        }
+                    },
+                    {
+                      $sort: {
+                        _id: 1
+                      }
+                    },
+                    // {
+                    //   $match: {
+                    //     "_id.month": 10
+                    //   }
+                    // }
+                    {
+                      $project: {
+                        month: {
+                          $let: {
+                            vars: {
+                                monthsInYear: [
+                                    "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+                                    "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
+                                  ]
+                            },
+                            in: {
+                              $arrayElemAt: [
+                                "$$monthsInYear",
+                                {
+                                  $subtract: ["$_id.month", 1]
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        sales: "$totalSales",
+                        _id: 0 // Excluir `_id` del resultado final
+                      }
+                    }
+                  ]
+ 
+                
+              ]);
+
+              return sales;
+
+        } catch (error) {
+            console.log('Error on get sales fom month', error);
+            return null
+        }
+    }
+
 }

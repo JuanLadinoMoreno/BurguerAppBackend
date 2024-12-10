@@ -53,3 +53,17 @@ export const getSalesForMonth = async (req, res, next) => {
         next(error)
     }
 }
+
+export const getSalesForCategoryMonth = async (req, res, next) => {
+    try {
+        const {cid} = req.params
+        const sales = await ticketsServices.getSalesForCategoryMonth(cid);
+        if(!sales) return res.json({status: 'error', message: 'Sales null'})
+
+        res.status(200).json({ status: 'success', payload: sales })
+    } catch (error) {
+        console.log(error);
+
+        next(error)
+    }
+}

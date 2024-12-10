@@ -69,6 +69,32 @@ export default class TicketsServices{
         return tickets
     
     }
+    
+    async getSalesForCategoryMonth(category) {
+        
+        if (!category) {
+            return CustomError.createError({
+                name: 'Category Problem',
+                cause: '',
+                message: 'Verify category are not empty',
+                code: ErrorCodes.NOT_FOUND
+            })
+
+        }
+
+        const tickets = await ticketsDAO.getSalesForCategoryMonth(category)
+        if (!tickets) {
+            return CustomError.createError({
+                name: 'Tickets Problem',
+                cause: '',
+                message: 'Problem to get sales for month',
+                code: ErrorCodes.NOT_FOUND
+            })
+
+        }
+        return tickets
+    
+    }
 
 
 }
