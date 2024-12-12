@@ -197,3 +197,20 @@ export const finPurchase = async (req, res, next) => {
         next(error)
     }
 }
+
+export const getCustomerCarts = async (req, res, next) => {
+    try {
+        
+        const cuId = req.params.cuid
+
+        let limit = +req.query.limit
+        const carts = await cartsService.getCustomerCarts(cuId)
+        // if (limit > 0) return res.json({status: 'success', payload: carts} )
+        // if (limit > 0) return res.json({status: 'success', payload: carts.slice(0, limit)} )
+        res.json({status: 'success', payload: carts})
+
+    } catch (error) {
+        next(error)
+    }
+
+}

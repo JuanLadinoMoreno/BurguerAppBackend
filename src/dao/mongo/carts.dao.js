@@ -400,4 +400,20 @@ export default class CartsManager {
             throw error;
         }
     }
+
+    async getCustomerCarts(CusId) {
+        try {            
+            const carts = await cartModel.find({ customer: CusId }).populate('products.pid').populate('user').populate('customer').sort({createdAt: -1})
+            
+            // const carts = await ticketModel.find({ customer: CusId }).populate('user').populate('customer').sort({createdAt: -1})
+            // const carts = await cartModel.find().populate('products.pid')//.populate('user');
+            // console.log('datos', productos)
+            // return datos
+            return carts.map(p => p.toObject({ virtuals: true }))
+
+        } catch (error) {
+            console.log(error);
+            return null
+        }
+    }
 }

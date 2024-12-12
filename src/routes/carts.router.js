@@ -1,5 +1,5 @@
 import { Router} from "express";
-import { createCart, deleteCartById, deleteProductCart, getCartById, getAllCarts, updProductQuant, getUserCarts, finPurchase, empyCart, addProdororQuantToCart, UpdateCartById } from "../controllers/carts.controller.js";
+import { createCart, deleteCartById, deleteProductCart, getCartById, getAllCarts, updProductQuant, getUserCarts, finPurchase, empyCart, addProdororQuantToCart, UpdateCartById, getCustomerCarts } from "../controllers/carts.controller.js";
 import { authMdw } from "../middlewares/auth.middleware.js";
 import { verifyAdminRoleMdw } from "../middlewares/verifyRole.middleware.js";
 
@@ -12,6 +12,9 @@ router.get('/', authMdw, verifyAdminRoleMdw, getAllCarts)
 
 //Obtiene carritos del usuario
 router.get('/user/:uid', authMdw, getUserCarts)//
+
+//Obtiene carritos del usuario
+router.get('/customer/:cuid', authMdw, getCustomerCarts)//
 
 //Solo el usuario admin obtiene todos los carritos
 router.get('/:cid', authMdw, verifyAdminRoleMdw, getCartById)

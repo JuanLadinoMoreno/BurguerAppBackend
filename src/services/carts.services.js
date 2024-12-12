@@ -513,4 +513,20 @@ export class CartsService {
         //     // throw error;
         // }
     }
+
+    async getCustomerCarts(cid) {
+
+        const cart = await cartsDAO.getCustomerCarts(cid)
+        if (!cart) {
+            return CustomError.createError({
+                name: 'Cart data error',
+                cause: '',
+                message: 'The cart is not found',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+        return cart
+
+    }
+
 }
