@@ -242,13 +242,13 @@ export class CartsService {
                     continue;
                 }
 
-                const calQuantity = existingCart.products.find(( prod ) => {
+                const calQuantity = existingCart.products.find((prod) => {
                     if (prod.pid._id.toString() === product.pid) {
-    
-                         const quant = product.quantity - prod.quantity
+
+                        const quant = product.quantity - prod.quantity
                     }
                 });
-                
+
                 const additionalQuantity = product.quantity - existingProduct.quantity;
 
                 // Validar stock para la cantidad adicional
@@ -456,7 +456,7 @@ export class CartsService {
 
     async finalizePurchase(cid, uid) {
         // try {
-        
+
         // Verifica que el carrito exista y sea del usuario logeado
         // const cart = await cartModel.findOne({ _id: cid, user: uid, status: 'created' }).populate('products.pid');
         const cart = await cartsDAO.verifyCartOfUser(cid, uid)
@@ -480,7 +480,7 @@ export class CartsService {
         //         code: ErrorCodes.INVALID_CREDENTIALS
         //     })
         // }
-        
+
         //Crae tiket en BD
         const customer = !cart.customer ? null : cart.customer._id
         const ticket = cartsDAO.saveTicket(cart.user._id, customer, cid, cart.products, cart.totalPrice)
@@ -504,7 +504,7 @@ export class CartsService {
             })
 
         await cartsDAO.cartSave(cart) //Guarda en BD
-        
+
         return ticket
         // }
 
@@ -517,6 +517,44 @@ export class CartsService {
     async getCustomerCarts(cid) {
 
         const cart = await cartsDAO.getCustomerCarts(cid)
+        if (!cart) {
+            return CustomError.createError({
+                name: 'Cart data error',
+                cause: '',
+                message: 'The cart is not found',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+        return cart
+
+    }
+
+    async UpdCartToCanceled(cid) {
+
+        const existingCart = await cartsDAO.getCartById(cid)
+        if (!existingCart) {
+            return CustomError.createError({
+                name: 'Cart data error',
+                cause: '',
+                message: 'The cart is not found',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+        for(const prod of existingCart.products){
+                const prodQauantityUpdate = await productsDAO.updateAddStockQuantity(prod.pid, prod.quantity);
+                if (!prodQauantityUpdate) {
+                    return CustomError.createError({
+                        name: 'Cart update quantity error',
+                        cause: '',
+                        message: 'The cart can not increment quantity',
+                        code: ErrorCodes.NOT_FOUND
+                    })
+                }
+        }
+        // existingCart.products.map((prod) => {
+        //     const prodUpdate = await productsDAO.updateAddStockQuantity(stockCheck._id, dif);
+        // })
+        const cart = await cartsDAO.UpdCartToCanceled(cid)
         if (!cart) {
             return CustomError.createError({
                 name: 'Cart data error',

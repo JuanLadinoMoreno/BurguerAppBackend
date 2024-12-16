@@ -207,9 +207,28 @@ export const getCustomerCarts = async (req, res, next) => {
         const carts = await cartsService.getCustomerCarts(cuId)
         // if (limit > 0) return res.json({status: 'success', payload: carts} )
         // if (limit > 0) return res.json({status: 'success', payload: carts.slice(0, limit)} )
+        if(!carts) return res.status(400).json({ status: 'error', message: 'Problem to get customers.' })
         res.json({status: 'success', payload: carts})
 
     } catch (error) {
+        next(error)
+    }
+
+}
+
+export const UpdCartToCanceled = async (req, res, next) => {
+    try {
+        const {cid} = req.params
+
+        const cart = await cartsService.UpdCartToCanceled(cid)
+        // if (limit > 0) return res.json({status: 'success', payload: carts} )
+        // if (limit > 0) return res.json({status: 'success', payload: carts.slice(0, limit)} )
+        if(!cart) return res.status(400).json({ status: 'error', message: 'Problem to cancel cart.' })
+        res.json({status: 'success', payload: cart})
+
+    } catch (error) {
+        // console.log(error);
+        
         next(error)
     }
 

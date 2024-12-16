@@ -13,7 +13,7 @@ export default class CartsManager {
 
     async getCarts() {
         try {
-            const carts = await cartModel.find().populate('products.pid').populate('customer');
+            const carts = await cartModel.find().populate('products.pid').populate('customer').populate('user').sort({createdAt: -1});
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');
             // console.log('datos', productos)
             // return datos
@@ -291,6 +291,23 @@ export default class CartsManager {
             );
 
             if(updatedCart) return null
+
+            return updatedCart   
+
+        } catch (error) {
+            console.log('Error: productInStockSave', error);
+            return null
+        }
+    }
+    async UpdCartToCanceled(cid) {
+        try {            
+            const updatedCart = await cartModel.findByIdAndUpdate(
+                cid,
+                { status: 'canceled' },
+                { new: true }
+            );
+
+            if(!updatedCart) return null
 
             return updatedCart   
 
