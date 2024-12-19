@@ -31,11 +31,12 @@ const usrSchema = new Schema(
         lastConnection: { 
             type: Date,
              default: null 
+        },
+        branch: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Branch',
+            required: true,
         }
-        // user: {
-        //     type: mongoose.Types.ObjectId,
-        //     ref: 'User'
-        // }
     },
     {
         timestamps: true,

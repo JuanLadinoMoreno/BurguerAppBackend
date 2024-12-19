@@ -73,7 +73,11 @@ const cartsSchema = new Schema({
         type: Number,
         required: true
     },
-    // products: [productSchema],
+    branch: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Branch',
+        required: true,
+    }
 
 },
     {

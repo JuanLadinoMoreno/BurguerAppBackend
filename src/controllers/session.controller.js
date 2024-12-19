@@ -59,6 +59,7 @@ export const login = async (req, res, next) => {
                 id: userFound.id,
                 fisrtsName: userFound.firstName,
                 email: userFound.email,
+                branch:userFound.branch
             }
         });
 
@@ -120,6 +121,7 @@ export const verifyToken = async (req, res) => {
                 id: userFound.id,
                 fisrtsName: userFound.firstName,
                 email: userFound.email,
+                branch:userFound.branch,
             }
         });
     });

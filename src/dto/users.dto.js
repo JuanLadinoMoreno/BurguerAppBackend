@@ -1,5 +1,5 @@
 export class usersDto {
-    constructor({ _id, firstName, lastName, age, email, password, role, lastConnection }) {
+    constructor({ _id, firstName, lastName, age, email, password, role, lastConnection, branch }) {
         this.id = _id
         this.firstName = firstName
         this.lastName = lastName
@@ -8,5 +8,11 @@ export class usersDto {
         this.password = password
         this.role = role
         this.lastConnection = lastConnection
+        this.branch = branch 
+            ? { 
+                id: branch._id, 
+                name: branch.name 
+            }
+            : null;
     }
 }

@@ -27,7 +27,7 @@ export default class usersDAO{
 
     async getUserByEmail(email){
         try {
-            const userFound = await userModel.findOne({ email });
+            const userFound = await userModel.findOne({ email }).populate('branch');
 
             if(!userFound) return null
 
@@ -77,7 +77,7 @@ export default class usersDAO{
 
     async findUserById (id) {
         try {   
-            const userFound = await userModel.findById(id) 
+            const userFound = await userModel.findById(id).populate('branch')
             
             if (!userFound)  return null
             

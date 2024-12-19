@@ -14,7 +14,7 @@ const usersService = new UsersService()
 
 export class CartsService {
 
-    async createCart(idUser, cart, customer, totalPrice) {
+    async createCart(idUser, cart, customer, totalPrice, branch) {
 
         // try {
         if (!idUser) {
@@ -86,7 +86,7 @@ export class CartsService {
             // }
         }
 
-        const cartUsr = { ...cart, user: idUser, status: 'created', customer, totalPrice }
+        const cartUsr = { ...cart, user: idUser, status: 'created', customer, totalPrice, branch }
 
 
 

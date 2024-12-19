@@ -69,7 +69,6 @@ export default class CartsManager {
     }
 
     async createCart(cart) {
-        // console.log('cartCreate', cart );
         try {
             // this.validaDatos(cart);
             if (!cart) {

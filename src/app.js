@@ -7,6 +7,7 @@ import { PORT } from './config/config.js';
 
 import productsRouter from './routes/products.router.js'
 import categoriesRouter from './routes/categories.router.js'
+import branchRouter from './routes/branchs.router.js'
 import cartsRouter from './routes/carts.router.js'
 import sessionRouter from './routes/session.router.js'
 import customersRouter from './routes/customer.router.js'
@@ -67,6 +68,7 @@ app.use(cookieParser())
 
 app.use('/api/products', productsRouter)
 app.use('/api/categories', categoriesRouter)
+app.use('/api/branches', branchRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/users', sessionRouter)
 app.use('/api/customers', customersRouter)
