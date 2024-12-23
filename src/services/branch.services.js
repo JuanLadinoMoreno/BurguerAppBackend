@@ -39,6 +39,20 @@ export class BranchService {
         return prodCreadoDTO
 
     }
+
+    async getBranchAvailable() {
+
+        const branch = await branchDAO.getBranchAvailable();
+        if (!branch) {
+            return CustomError.createError({
+                name: "BranchNotFoundError",
+                cause: '',
+                message: "No se encontraron sucursales en la base de datos.",
+                code: ErrorCodes.NOT_FOUND
+            });
+        }
+        return branch
+    }
     
     async changeUserBranch(userId, branchId) {
         if (!userId || !branchId) {

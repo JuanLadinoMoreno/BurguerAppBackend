@@ -22,6 +22,17 @@ export default class BranchDAO{
         }
     }
 
+    async getBranchAvailable() {
+        try {
+            const productos = await branchModel.find({status: true});
+            return productos.map(p => p.toObject({ virtuals: true }))
+
+        } catch (error) {
+            console.log(error);
+            return null
+        }
+    }
+
     async changeUserBranch(userId, branchId){
         try {
             return userModel.findByIdAndUpdate(userId, { $set: { branch: branchId } }, { returnDocument: 'after' }).populate('branch')

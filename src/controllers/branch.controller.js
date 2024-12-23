@@ -33,6 +33,19 @@ export const createBranch = async (req, res, next) => {
 
 }
 
+export const getBranchAvailable = async (req, res) => {
+    
+    try {
+        const branch = await branchService.getBranchAvailable();
+        if (!branch) return res.json({ status: 'error', message: 'Branch null' })
+
+        res.status(200).json({ status: 'success', payload: branch })
+    } catch (error) {
+        // return res.status(500).json({ status: error,  message: error.message });
+        next(error)
+    }
+}
+
 export const changeUserBranch = async (req, res, next) => {
     try {
         const uid = req.params.uid
