@@ -53,7 +53,32 @@ export class BranchService {
         }
         return branch
     }
-    
+
+    async updateBranchById(bid, branch) {
+        const branchFind = await branchDAO.getBranchById(bid)
+        if (!branchFind) {
+
+            return CustomError.createError({
+                name: 'Branch data error',
+                cause: '',
+                message: 'The branch is not exists',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+
+        const branchUpd = await branchDAO.updateBranchById(bid, branch)
+        if (!branchUpd)
+            return CustomError.createError({
+                name: 'Branch update error',
+                cause: '',
+                message: 'The branch can not be updated',
+                code: ErrorCodes.NOT_FOUND
+            })
+        
+            const branchUpdDTO = new BranchsDTO(branchUpd)
+            return branchUpdDTO
+    }
+
     async changeUserBranch(userId, branchId) {
         if (!userId || !branchId) {
             return CustomError.createError({
