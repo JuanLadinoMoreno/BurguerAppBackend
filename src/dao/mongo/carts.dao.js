@@ -432,4 +432,12 @@ export default class CartsManager {
             return null
         }
     }
+
+    async getCartInTable(tableNumber, bracnchId) {
+        try{
+            return await cartModel.find({tableNumber, orderType: 'En mesa', status: 'created', branch: bracnchId})
+        }catch(error){
+            console.log('Error al obtener orden y numero de mesa', error)
+        }
+    }
 }

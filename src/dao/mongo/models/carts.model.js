@@ -77,8 +77,16 @@ const cartsSchema = new Schema({
         type: mongoose.Types.ObjectId,
         ref: 'Branch',
         required: true,
-    }
-
+    },
+    tableNumber: {
+        type: Number,
+        required: true
+        // set: v => v === "" ? null : null
+    },
+    orderType: {
+        type: String,
+        required: true,
+    },
 },
     {
         timestamps: true,

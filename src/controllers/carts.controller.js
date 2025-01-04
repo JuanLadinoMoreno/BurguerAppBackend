@@ -22,11 +22,13 @@ export const createCart = async (req, res, next) => {
     
     try {
         const usrId = new mongoose.Types.ObjectId(req.user.id)        
-        // const cart = req.body
         
-        const {products, customer, totalPrice, branch} = req.body
         
-        const cartCreado = await cartsService.createCart(usrId, { products }, customer, totalPrice, branch)
+        const {products, customer, totalPrice, branch, tableNumber, orderType} = req.body
+        
+        
+        
+        const cartCreado = await cartsService.createCart(usrId, { products }, customer, totalPrice, branch, tableNumber, orderType)
         
         if(!cartCreado){
             res.status(500).json({status: 'error', message: 'Error al crear producto'})

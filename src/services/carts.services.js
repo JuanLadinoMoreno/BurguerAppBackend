@@ -14,7 +14,7 @@ const usersService = new UsersService()
 
 export class CartsService {
 
-    async createCart(idUser, cart, customer, totalPrice, branch) {
+    async createCart(idUser, cart, customer, totalPrice, branch, tableNumber, orderType) {
 
         // try {
         if (!idUser) {
@@ -45,6 +45,33 @@ export class CartsService {
                 code: ErrorCodes.NOT_FOUND
             })
         }
+
+        if (orderType === 'En mesa' && !tableNumber) {
+            return CustomError.createError({
+                name: 'Cart data error',
+                cause: '',
+                message: 'Para ordenar en mesa es obligatorio numero de mesa',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
+
+  
+
+        if (tableNumber && tableNumber !== 0) {
+            
+            const findTable = await cartsDAO.getCartInTable(tableNumber, findUser.branch._id)
+            
+            if(findTable.length > 0){
+                return CustomError.createError({
+                    name: 'Cart table error',
+                    cause: '',
+                    message: `La mesa número ${tableNumber} ya está ocupada.`,
+                    code: ErrorCodes.EXISTING_DATA
+                })
+            }
+        }
+
+
 
         for (const product of cart.products) {
             let productInStock = await productsDAO.findProductById(product.pid);
@@ -86,7 +113,7 @@ export class CartsService {
             // }
         }
 
-        const cartUsr = { ...cart, user: idUser, status: 'created', customer, totalPrice, branch }
+        const cartUsr = { ...cart, user: idUser, status: 'created', customer, totalPrice, branch, tableNumber, orderType }
 
 
 
