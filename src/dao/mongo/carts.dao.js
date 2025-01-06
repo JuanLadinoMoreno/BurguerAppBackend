@@ -433,11 +433,22 @@ export default class CartsManager {
         }
     }
 
+    //Verifica que este ocupada o no la mesa
     async getCartInTable(tableNumber, bracnchId) {
         try{
             return await cartModel.find({tableNumber, orderType: 'En mesa', status: 'created', branch: bracnchId})
         }catch(error){
             console.log('Error al obtener orden y numero de mesa', error)
+        }
+    }
+
+    //Obteiene que mesas estan ocupadas
+    async getTablesOccupied(bracnchId) {
+        try{
+            return await cartModel.find({orderType: 'En mesa', status: 'created', branch: bracnchId}, {tableNumber: 1})
+            // return await cartModel.find()
+        }catch(error){
+            console.log('Error al obtener mesas ocupadas', error)
         }
     }
 }

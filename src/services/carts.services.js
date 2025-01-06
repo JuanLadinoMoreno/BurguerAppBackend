@@ -55,13 +55,13 @@ export class CartsService {
             })
         }
 
-  
+
 
         if (tableNumber && tableNumber !== 0) {
-            
+
             const findTable = await cartsDAO.getCartInTable(tableNumber, findUser.branch._id)
-            
-            if(findTable.length > 0){
+
+            if (findTable.length > 0) {
                 return CustomError.createError({
                     name: 'Cart table error',
                     cause: '',
@@ -556,6 +556,7 @@ export class CartsService {
 
     }
 
+
     async UpdCartToCanceled(cid) {
 
         const existingCart = await cartsDAO.getCartById(cid)
@@ -567,16 +568,16 @@ export class CartsService {
                 code: ErrorCodes.NOT_FOUND
             })
         }
-        for(const prod of existingCart.products){
-                const prodQauantityUpdate = await productsDAO.updateAddStockQuantity(prod.pid, prod.quantity);
-                if (!prodQauantityUpdate) {
-                    return CustomError.createError({
-                        name: 'Cart update quantity error',
-                        cause: '',
-                        message: 'The cart can not increment quantity',
-                        code: ErrorCodes.NOT_FOUND
-                    })
-                }
+        for (const prod of existingCart.products) {
+            const prodQauantityUpdate = await productsDAO.updateAddStockQuantity(prod.pid, prod.quantity);
+            if (!prodQauantityUpdate) {
+                return CustomError.createError({
+                    name: 'Cart update quantity error',
+                    cause: '',
+                    message: 'The cart can not increment quantity',
+                    code: ErrorCodes.NOT_FOUND
+                })
+            }
         }
         // existingCart.products.map((prod) => {
         //     const prodUpdate = await productsDAO.updateAddStockQuantity(stockCheck._id, dif);
@@ -594,4 +595,29 @@ export class CartsService {
 
     }
 
+    async getTablesOccupied(userId) {
+
+        const user = await usersDAO.findUserById(userId)
+        if (!user) {
+            return CustomError.createError({
+                name: 'User error',
+                cause: '',
+                message: 'User not found',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+        // console.log(user.branch._id);
+        
+        const tablesOccupied = await cartsDAO.getTablesOccupied(user.branch._id)
+        if (!tablesOccupied) {
+            return CustomError.createError({
+                name: 'Cart data error',
+                cause: '',
+                message: 'Available tables not found',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+        return tablesOccupied
+
+    }
 }

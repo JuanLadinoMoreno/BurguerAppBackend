@@ -235,3 +235,15 @@ export const UpdCartToCanceled = async (req, res, next) => {
     }
 
 }
+//obtiene las mesas disponibles en la sucuarsal del usuario
+export const getTablesOccupied = async (req, res, next) => {
+    try {        
+        const userId = new mongoose.Types.ObjectId(req.user.id)
+        const tablesOccupied = await cartsService.getTablesOccupied(userId)
+        res.status(200).json({status: 'success', payload: tablesOccupied})
+    } catch (error) {
+        // return res.status(500).json({ message: error.message });
+        next(error)
+    }
+}
+

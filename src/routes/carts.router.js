@@ -1,5 +1,5 @@
 import { Router} from "express";
-import { createCart, deleteCartById, deleteProductCart, getCartById, getAllCarts, updProductQuant, getUserCarts, finPurchase, empyCart, addProdororQuantToCart, UpdateCartById, getCustomerCarts, UpdCartToCanceled } from "../controllers/carts.controller.js";
+import { createCart, deleteCartById, deleteProductCart, getCartById, getAllCarts, updProductQuant, getUserCarts, finPurchase, empyCart, addProdororQuantToCart, UpdateCartById, getCustomerCarts, UpdCartToCanceled, getTablesOccupied } from "../controllers/carts.controller.js";
 import { authMdw } from "../middlewares/auth.middleware.js";
 import { verifyAdminRoleMdw } from "../middlewares/verifyRole.middleware.js";
 
@@ -9,6 +9,9 @@ const router = Router()
 router.post('/', authMdw, createCart)
 
 router.get('/', authMdw, verifyAdminRoleMdw, getAllCarts)
+
+//Obtiene las mesas disponibles en la sucuarsal del usuario
+router.get('/tables-occupied',authMdw, getTablesOccupied)
 
 //Obtiene carritos del usuario
 router.get('/user/:uid', authMdw, getUserCarts)//
