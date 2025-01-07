@@ -152,6 +152,22 @@ export class CartsService {
 
     }
 
+    async getUserCartsInBranch(uid, bid) {
+
+        const user = await usersService.findUserById(uid)
+        if (!user)
+            return CustomError.createError({
+                name: 'User data error',
+                cause: '',
+                message: 'The user is not found',
+                code: ErrorCodes.NOT_FOUND
+            })
+        const carts = await cartsDAO.getUserCartsInBranch(uid, bid)
+        return carts
+
+
+    }
+
     async getCartById(cid) {
 
         const cart = await cartsDAO.getCartById(cid)

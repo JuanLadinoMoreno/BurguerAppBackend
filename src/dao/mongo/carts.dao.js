@@ -37,6 +37,16 @@ export default class CartsManager {
         }
     }
 
+    async getUserCartsInBranch(usrId, branchId) {
+        try {
+            const carts = await cartModel.find({ user: usrId, status: "created", branch: branchId }).populate('products.pid').populate('user').populate('customer').populate('branch').sort({createdAt: -1})            
+            return carts.map(p => p.toObject({ virtuals: true }))
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async getCartById(id) {
         try {
             const cart = await cartModel.findOne({ _id: id }).populate('products.pid');
