@@ -84,7 +84,7 @@ export default class usersDAO{
             return userFound;    
             
         } catch (error) {
-            console.log('Error on login', e);
+            console.log('Error on login', error);
             return null
         }
     }

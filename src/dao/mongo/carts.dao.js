@@ -13,7 +13,7 @@ export default class CartsManager {
 
     async getCarts() {
         try {
-            const carts = await cartModel.find().populate('products.pid').populate('customer').populate('user').sort({createdAt: -1});
+            const carts = await cartModel.find().populate('products.pid').populate('customer').populate('user').populate('branch').sort({createdAt: -1});
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');
             // console.log('datos', productos)
             // return datos
@@ -26,7 +26,7 @@ export default class CartsManager {
 
     async getUserCarts(usrId) {
         try {
-            const carts = await cartModel.find({ user: usrId, status: "created" }).populate('products.pid').populate('user').populate('customer').sort({createdAt: -1})
+            const carts = await cartModel.find({ user: usrId, status: "created" }).populate('products.pid').populate('user').populate('customer').populate('branch').sort({createdAt: -1})
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');
             // console.log('datos', productos)
             // return datos
@@ -429,7 +429,7 @@ export default class CartsManager {
 
     async getCustomerCarts(CusId) {
         try {            
-            const carts = await cartModel.find({ customer: CusId }).populate('products.pid').populate('user').populate('customer').sort({createdAt: -1})
+            const carts = await cartModel.find({ customer: CusId }).populate('products.pid').populate('user').populate('customer').populate('branch').sort({createdAt: -1})
             
             // const carts = await ticketModel.find({ customer: CusId }).populate('user').populate('customer').sort({createdAt: -1})
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');

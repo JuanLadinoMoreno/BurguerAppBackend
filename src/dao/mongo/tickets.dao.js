@@ -9,7 +9,13 @@ export default class TicketsDAO {
             return await ticketModel.find()
                                     .populate('user')
                                     .populate('customer')
-                                    .populate('cart')
+                                    .populate({
+                                      path: 'cart',
+                                      populate: {
+                                        path: 'branch',
+                                        model: 'Branch'
+                                      }
+                                    })
                                     .populate({
                                         path: 'productsSell.pid',
                                         model: 'Product' 
