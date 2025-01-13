@@ -106,10 +106,10 @@ export const UpdateCartById = async (req, res, next) => {
     
     try {
         // const usrId = new mongoose.Types.ObjectId(req.user.id)        
-        const {cart ,cid, totalPrice} = req.body
+        const {cart ,cid, totalPrice, orderType, tableNumber} = req.body
         
         
-        const cartUpdated = await cartsService.UpdateCartById(cid, cart, totalPrice)
+        const cartUpdated = await cartsService.UpdateCartById(cid, cart, totalPrice, orderType, tableNumber)
         
         if(!cartUpdated){
             return res.status(500).json({status: 'error', message: 'Error al actualizar carrito'})

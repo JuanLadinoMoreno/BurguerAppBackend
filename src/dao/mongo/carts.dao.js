@@ -112,13 +112,13 @@ export default class CartsManager {
         }
     }
 
-    async UpdateCartById(cid, cart, totalPrice) {
+    async UpdateCartById(cid, cart, totalPrice, orderType, tableNumber) {
         try {
             // cart.products = []
             // cart.status = 'empty'
             // console.log('dao---------------->>', cart);
 
-            return cartModel.findByIdAndUpdate(cid, { $set: {products: cart, totalPrice} }, { returnDocument: 'after' })
+            return cartModel.findByIdAndUpdate(cid, { $set: {products: cart, totalPrice, orderType, tableNumber} }, { returnDocument: 'after' })
             // const empyCart = cart.save();
             // return empyCart
 

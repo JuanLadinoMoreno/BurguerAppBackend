@@ -223,7 +223,7 @@ export class CartsService {
 
     }
 
-    async UpdateCartById(cid, cart, totalPrice) {
+    async UpdateCartById(cid, cart, totalPrice, orderType, tableNumber) {
 
         if (!cid || !cart) {
             return CustomError.createError({
@@ -347,7 +347,7 @@ export class CartsService {
         }
 
 
-        const updateCart = await cartsDAO.UpdateCartById(cid, cart, totalPrice)
+        const updateCart = await cartsDAO.UpdateCartById(cid, cart, totalPrice, orderType, tableNumber)
         // const updateCart = await cartsDAO.UpdateCartById(cid, existingCart)
         // console.log('updateCart------ ', updateCart)
 
