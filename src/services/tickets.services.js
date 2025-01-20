@@ -54,9 +54,17 @@ export default class TicketsServices{
     
     }
     
-    async getSalesForMonth() {
+    async getSalesForMonth(anio, branch) {
+
+        // Si no se envían mes y año, tomar el mes y año actuales
+        const fechaActual = new Date();
+        const anioBuscar = anio.getUTCFullYear() || fechaActual.getUTCFullYear();
+
+        const inicio = new Date(anioBuscar, 0, 1);
+        const fin = new Date(anioBuscar + 1, 0, 1);
+        
     
-        const tickets = await ticketsDAO.getSalesForMonth()
+        const tickets = await ticketsDAO.getSalesForMonth(inicio, fin, branch)
         if (!tickets) {
             return CustomError.createError({
                 name: 'Tickets Problem',
@@ -70,7 +78,12 @@ export default class TicketsServices{
     
     }
     
-    async getSalesForCategoryMonth(category) {
+    async getSalesForCategoryMonth(anio, branch, category) {
+        
+        const anioBuscar = anio.getUTCFullYear() || fechaActual.getUTCFullYear();
+
+        const inicio = new Date(anioBuscar, 0, 1);
+        const fin = new Date(anioBuscar + 1, 0, 1);
         
         if (!category) {
             return CustomError.createError({
@@ -82,7 +95,7 @@ export default class TicketsServices{
 
         }
 
-        const tickets = await ticketsDAO.getSalesForCategoryMonth(category)
+        const tickets = await ticketsDAO.getSalesForCategoryMonth(inicio, fin, branch, category)
         if (!tickets) {
             return CustomError.createError({
                 name: 'Tickets Problem',

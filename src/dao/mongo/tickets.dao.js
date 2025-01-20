@@ -90,10 +90,38 @@ export default class TicketsDAO {
         }
     }
 
-    async getSalesForMonth(){
+    async getSalesForMonth( inicio, fin, branch){
         try {
             const sales = await ticketModel.aggregate([
- 
+              {
+                $match: {
+                  purchase_datetime: {
+                    $gte: new Date(inicio),
+                    $lt: new Date(fin)
+                  }
+                }
+              },
+              {
+                $lookup: {
+                  from: "carts",
+                  // Nombre de la colección de carts
+                  localField: "cart",
+                  // Campo en la colección actual que referencia a carts
+                  foreignField: "_id",
+                  // Campo en carts que corresponde al ID
+                  as: "cartDetails" // Nombre del nuevo campo con los datos del join
+                }
+              },
+              // Desempaqueta el array de cartDetails para acceder a sus propiedades
+              {
+                $unwind: "$cartDetails"
+              },
+              // Filtra los resultados por el ID de la branch en cartDetails
+              {
+                $match: {
+                  "cartDetails.branch": branch // Reemplaza con el ID real de la branch
+                }
+              },
                 {
                   $group: {
                     _id: { $month: "$purchase_datetime" }, // Agrupar por mes
@@ -130,11 +158,40 @@ export default class TicketsDAO {
         }
     }
 
-    async getSalesForCategoryMonth( tipo ){
+    async getSalesForCategoryMonth( inicio, fin, branch, tipo ){
         try {
             const sales = await ticketModel.aggregate([
 
                 [
+                  {
+                    $match: {
+                      purchase_datetime: {
+                        $gte: inicio,
+                        $lt: fin
+                      }
+                    }
+                  },
+                  {
+                    $lookup: {
+                      from: "carts",
+                      // Nombre de la colección de carts
+                      localField: "cart",
+                      // Campo en la colección actual que referencia a carts
+                      foreignField: "_id",
+                      // Campo en carts que corresponde al ID
+                      as: "cartDetails" // Nombre del nuevo campo con los datos del join
+                    }
+                  },
+                  // Desempaqueta el array de cartDetails para acceder a sus propiedades
+                  {
+                    $unwind: "$cartDetails"
+                  },
+                  // Filtra los resultados por el ID de la branch en cartDetails
+                  {
+                    $match: {
+                      "cartDetails.branch": branch // Reemplaza con el ID real de la branch
+                    }
+                  },
                     {
                       $unwind: "$productsSell"
                     },

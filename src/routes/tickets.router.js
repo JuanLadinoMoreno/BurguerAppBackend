@@ -9,7 +9,7 @@ router.get('/', authMdw, verifyAdminRoleMdw, getTickets)
 router.get('/totalamount', authMdw, verifyAdminRoleMdw, getSalesFromYear)
 router.get('/totalamountmonth', authMdw, verifyAdminRoleMdw, getSalesFromMonthYear)
 router.get('/salesformonth', authMdw, verifyAdminRoleMdw, getSalesForMonth)
-router.get('/salescategorymonth/:cid', authMdw, verifyAdminRoleMdw, getSalesForCategoryMonth)
+router.get('/salescategorymonth', authMdw, verifyAdminRoleMdw, getSalesForCategoryMonth)
 
 
 
