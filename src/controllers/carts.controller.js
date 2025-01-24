@@ -72,6 +72,22 @@ export const getUserCarts = async (req, res, next) => {
 
 }
 
+export const getAllUserCarts = async (req, res, next) => {
+    try {
+        
+        const usrId = req.params.uid
+
+        let limit = +req.query.limit
+        const carts = await cartsService.getAllUserCarts(usrId)
+        if (limit > 0) return res.json({status: 'success', payload: carts.slice(0, limit)} )
+        res.json({status: 'success', payload: carts})
+
+    } catch (error) {
+        next(error)
+    }
+
+}
+
 export const getUserCartsInBranch = async (req, res, next) => {
     try {
         

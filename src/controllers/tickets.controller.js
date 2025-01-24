@@ -44,8 +44,7 @@ export const getSalesFromYear = async (req, res, next) => {
 
 export const getSalesForMonth = async (req, res, next) => {
     try {
-        const {anio, branch} = req.query
-        console.log('branch', branch);        
+        const {anio, branch} = req.query      
         const branchId = new mongoose.Types.ObjectId(branch)
         const anioD = new Date(anio)
         // console.log('anio', anio);
@@ -66,9 +65,6 @@ export const getSalesForCategoryMonth = async (req, res, next) => {
     try {
         // const {cid} = req.params
         const {cid, anio, branch} = req.query
-        console.log('cid', cid);
-        console.log('anio', anio);
-        console.log('branch', branch);
         const branchId = new mongoose.Types.ObjectId(branch)
         // const cId = new mongoose.Types.ObjectId(cid)
         const anioD = new Date(anio)
