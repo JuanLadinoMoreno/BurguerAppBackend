@@ -8,7 +8,7 @@ import { verifyAdminRoleMdw } from "../middlewares/verifyRole.middleware.js";
 const router = Router()
 
 router.post('/register', authMdw, verifyAdminRoleMdw, register)
-router.get('/', authMdw, verifyAdminRoleMdw, getCustomers)
+router.get('/', authMdw, getCustomers)
 router.get('/:cid', authMdw, verifyAdminRoleMdw, getCustomerById)
 router.put('/:cid', authMdw, verifyAdminRoleMdw, updateCustomerById)
 router.delete('/:cid', authMdw, verifyAdminRoleMdw, deleteCustomerById)

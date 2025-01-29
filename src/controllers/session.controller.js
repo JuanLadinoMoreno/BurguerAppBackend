@@ -59,7 +59,8 @@ export const login = async (req, res, next) => {
                 id: userFound.id,
                 fisrtsName: userFound.firstName,
                 email: userFound.email,
-                branch:userFound.branch
+                branch:userFound.branch,
+                role: userFound.role
             }
         });
 
@@ -122,6 +123,7 @@ export const verifyToken = async (req, res) => {
                 fisrtsName: userFound.firstName,
                 email: userFound.email,
                 branch:userFound.branch,
+                role: userFound.role
             }
         });
     });

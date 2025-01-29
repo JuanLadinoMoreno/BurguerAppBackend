@@ -25,8 +25,8 @@ router.get('/user/:uid/branch/:bid', authMdw, getUserCartsInBranch)//
 //Obtiene carritos del usuario
 router.get('/customer/:cuid', authMdw, getCustomerCarts)//
 
-//Solo el usuario admin obtiene todos los carritos
-router.get('/:cid', authMdw, verifyAdminRoleMdw, getCartById)
+//Solo el usuario obtiene todos los carritos
+router.get('/:cid', authMdw, getCartById)
 
 //Vaciar carrito
 router.put('/:cid', authMdw, empyCart)
