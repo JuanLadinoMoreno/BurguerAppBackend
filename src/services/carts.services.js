@@ -5,6 +5,9 @@ import CustomError from "./errors/CustomError.js"
 import ErrorCodes from "./errors/errorCodes.js"
 
 import UsersService from "../services/users.services.js";
+import transport from "../config/emailTransport.js"
+
+import { templateHtmlCarrito } from "../templates/emailTicket.js"
 
 const usersDAO = new UsersDAO()
 const cartsDAO = new CartsDAO()
@@ -562,6 +565,33 @@ export class CartsService {
             })
 
         await cartsDAO.cartSave(cart) //Guarda en BD
+
+        if (cart.customer || cart.customer.email !== null) {
+            try {
+
+                await transport.sendMail({
+                    from: 'BurguerLocas',
+                    to: cart.customer.email,
+                    // to: cart.customer.email,
+                    subject: "Ticket de compra",
+                    html: templateHtmlCarrito(cart),
+                    attachments: [        
+                        {
+                            filename: 'meme.jpg',
+                            path: `public/img/logoSl.png`,
+                            // path: `${__dirname}/img/logoSl.png`,
+                            cid: 'logoP'
+                        }
+                    ]
+                })
+                
+            } catch (error) {
+                console.error('Error al enviar comprobante por correo', error);
+            }
+            
+            
+        }
+        
 
         return ticket
         // }

@@ -276,7 +276,7 @@ export default class CartsManager {
     async verifyCartOfUser(cid, uid) {
         try {
             // Verifica que el carrito exista y sea del usuario logeado            
-            const cart = await cartModel.findOne({ _id: cid, user: uid, status: 'created' }).populate('products.pid');
+            const cart = await cartModel.findOne({ _id: cid, user: uid, status: 'created' }).populate('products.pid').populate('user').populate('customer').populate('branch');
             return cart
         } catch (error) {
             console.log('Error: ', error);
