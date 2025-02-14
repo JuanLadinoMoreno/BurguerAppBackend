@@ -5,7 +5,7 @@ import bcryptjs from "bcryptjs";
 
 export default class usersDAO{
 
-    async createUser(firstName, lastName, age, email, pswHash) {
+    async createUser(firstName, lastName, age, email, pswHash, tipo, branch) {
         try {
 
             const usr = await userModel.create({
@@ -14,7 +14,8 @@ export default class usersDAO{
                 age: +age,
                 email,
                 password: pswHash,
-                role: 'user'
+                role: tipo,
+                branch
             })
 
             return usr

@@ -14,7 +14,7 @@ const UsersDAO = new usersDAO();
 export default class usersService {
 
 
-    async createUser(firstName, lastName, age, email, password) {
+    async createUser(firstName, lastName, age, email, password, tipo, branch) {
         // try {
 
 
@@ -23,11 +23,13 @@ export default class usersService {
             !age ||
             age <= 0 ||
             !email ||
-            !password
+            !password ||
+            !tipo ||
+            !branch
         ) {
             CustomError.createError({
                 name: 'User data error',
-                cause: generateInvalidUserDataError({ firstName, lastName, age, email, password }),
+                cause: generateInvalidUserDataError({ firstName, lastName, age, email, password, tipo, branch }),
                 message: 'Data error trying to create a new user',
                 code: ErrorCodes.INVALID_TYPES_ERROR
             })
@@ -48,7 +50,7 @@ export default class usersService {
 
         const pswHash = await bcryptjs.hash(password, 11)
 
-        const usr = await UsersDAO.createUser(firstName, lastName, age, email, pswHash)
+        const usr = await UsersDAO.createUser(firstName, lastName, age, email, pswHash, tipo, branch)
         const userDTO = new usersDto(usr)
         return userDTO
 
