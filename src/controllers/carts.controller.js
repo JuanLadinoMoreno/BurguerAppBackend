@@ -127,9 +127,9 @@ export const UpdateCartById = async (req, res, next) => {
         
         const cartUpdated = await cartsService.UpdateCartById(cid, cart, totalPrice, orderType, tableNumber)
         
-        if(!cartUpdated){
-            return res.status(500).json({status: 'error', message: 'Error al actualizar carrito'})
-        }
+        // if(!cartUpdated){
+        //     return res.status(500).json({status: 'error', message: 'Error al actualizar carrito'})
+        // }
 
         res.status(201).json({status: 'succes', payload: cartUpdated})
     } catch (error) {        
@@ -142,10 +142,7 @@ export const deleteCartById = async (req, res, next) => {
     try {
         const cartId = req.params.cid
         const cartDel = await cartsService.deleteCartById(cartId)
-
-        if (!cartDel) return res.status(500).json({ payload: 'error', message: `Carrito con ID ${cartId} no fue posibles ser eliminado, verifique que exista` })
-
-        res.status(200).json({ payload: 'seccess', message: `Carrito con ID ${cartId} eliminado exitosamente` })
+        res.status(200).json({ status: 'seccess', payload:cartDel, message: `Carrito con ID ${cartId} eliminado exitosamente` })
     } catch (error) {
         next(error)
     }
@@ -209,9 +206,7 @@ export const deleteProductCart = async (req, res, next) => {
         const pid = req.params.pid
 
         const prodCreado = await cartsService.deleteProductCart(cid, pid)
-        if (!prodCreado) return res.status(404).json({ status: 'error', message: 'error al eliminar el producto o el carrito no existe' })
-
-        res.status(200).json({status: 'error', payload: prodCreado})
+        res.status(204).json({status: 'error', payload: prodCreado})
     } catch (error) {
         next(error)        
     }
@@ -223,10 +218,7 @@ export const finPurchase = async (req, res, next) => {
         const cid = req.params.cid
         const uid = req.user.id
 
-        const ticket = await cartsService.finalizePurchase(cid, uid)        
-        
-        if(!ticket) return res.status(400).json({ status: 'seccess', message: 'Problem to create product.' })
-
+        const ticket = await cartsService.finalizePurchase(cid, uid)
          res.status(200).json({ status: 'seccess', payload: ticket })
 
     }catch(error){
@@ -241,10 +233,8 @@ export const getCustomerCarts = async (req, res, next) => {
 
         let limit = +req.query.limit
         const carts = await cartsService.getCustomerCarts(cuId)
-        // if (limit > 0) return res.json({status: 'success', payload: carts} )
         // if (limit > 0) return res.json({status: 'success', payload: carts.slice(0, limit)} )
-        if(!carts) return res.status(400).json({ status: 'error', message: 'Problem to get customers.' })
-        res.json({status: 'success', payload: carts})
+        res.status(200).json({status: 'success', payload: carts})
 
     } catch (error) {
         next(error)
@@ -259,8 +249,7 @@ export const UpdCartToCanceled = async (req, res, next) => {
         const cart = await cartsService.UpdCartToCanceled(cid)
         // if (limit > 0) return res.json({status: 'success', payload: carts} )
         // if (limit > 0) return res.json({status: 'success', payload: carts.slice(0, limit)} )
-        if(!cart) return res.status(400).json({ status: 'error', message: 'Problem to cancel cart.' })
-        res.json({status: 'success', payload: cart})
+        res.status(201).json({status: 'success', payload: cart})
 
     } catch (error) {
         // console.log(error);

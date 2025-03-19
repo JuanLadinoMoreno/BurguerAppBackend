@@ -2,6 +2,7 @@ import moment from "moment";
 import UsersDAO from "../dao/mongo/users.dao.js";
 import CustomError from "./errors/CustomError.js";
 import transport from "../config/emailTransport.js";
+import ErrorCodes from "./errors/errorCodes.js";
 
 const usersDAO = new UsersDAO();
 
@@ -12,11 +13,11 @@ export default class EmailService{
         // Obtiene todos los usuarios
         const allUsers = await usersDAO.getUsers();
         if (!allUsers) {
-            return CustomError.createError({
-                name: 'Users error',
+            throw CustomError.createError({
+                name: 'UsersError',
                 cause: '',
-                message: 'Problem to get users',
-                code: ErrorCodes.IVALIT_CREDENTALS
+                message: 'Problemas al obtener los usuarios',
+                code: ErrorCodes.NOT_FOUND
             })
         }
 
@@ -26,8 +27,15 @@ export default class EmailService{
             const hoursDiff = moment().diff(lastConnection, 'hours');
             return hoursDiff >= 1;
         });
-
         
+        if (!inactiveUsers) {
+            throw CustomError.createError({
+                name: 'UsersInactivesError',
+                cause: '',
+                message: 'Sin ususarios inactivos',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }        
 
         // Envia correos a los usuarios inactivos
         for (const user of inactiveUsers) {

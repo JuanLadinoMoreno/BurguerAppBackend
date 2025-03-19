@@ -10,21 +10,30 @@ export class BranchService {
 
     async getBranch() {
 
-        const products = await branchDAO.getBranch();
-        if (!products) {
+        const branch = await branchDAO.getBranch();
+        if (!branch) {
             return CustomError.createError({
                 name: "ProductsNotFoundError",
                 cause: '',
-                message: "No se encontraron productos en la base de datos.",
+                message: "No se encontraron sucursales en la base de datos.",
                 code: ErrorCodes.NOT_FOUND
             });
         }
-        return products
+        return branch
         // return new BurgerDTO(products)
     }
 
     async createBranch(branch) {
 
+        if (!branch) {
+            return CustomError.createError({
+                name: 'BranchDataError',
+                cause: '',
+                message: 'Error en datos de sucursal',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+
+        }
         const branchCreate = await branchDAO.createBranch(branch)
         if (!branchCreate) {
             return CustomError.createError({
@@ -55,13 +64,20 @@ export class BranchService {
     }
 
     async updateBranchById(bid, branch) {
+        if(!bid || bid.trim() === "" || !branch)
+            throw CustomError.createError({
+                name: 'UpdateDataError',
+                cause: '',
+                message: 'Error en los datos de actualización',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
         const branchFind = await branchDAO.getBranchById(bid)
         if (!branchFind) {
 
             return CustomError.createError({
-                name: 'Branch data error',
+                name: 'BranchNotFound',
                 cause: '',
-                message: 'The branch is not exists',
+                message: 'La sucursal no existe',
                 code: ErrorCodes.NOT_FOUND
             })
         }
@@ -71,7 +87,7 @@ export class BranchService {
             return CustomError.createError({
                 name: 'Branch update error',
                 cause: '',
-                message: 'The branch can not be updated',
+                message: 'Problemas al actualizar la sucuesal',
                 code: ErrorCodes.NOT_FOUND
             })
         
@@ -104,8 +120,8 @@ export class BranchService {
             return CustomError.createError({
                 name: 'ProductError',
                 cause: '',
-                message: 'Error to create product',
-                code: ErrorCodes.EXISTING_DATA
+                message: 'No se pudo actualizar la sucursal del usuario',
+                code: ErrorCodes.NOT_FOUND
             })
 
         }

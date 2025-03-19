@@ -20,11 +20,11 @@ export class CartsService {
     async createCart(idUser, cart, customer, totalPrice, branch, tableNumber, orderType) {
 
         // try {
-        if (!idUser) {
-            return CustomError.createError({
-                name: 'User data error',
+        if (!idUser || !cart || !totalPrice || !branch || !tableNumber || !orderType) {
+            throw CustomError.createError({
+                name: 'CartDataError',
                 cause: '',
-                message: 'Proporcione id',
+                message: 'Verifique que los datos el carrito existan',
                 code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
         }
@@ -41,17 +41,17 @@ export class CartsService {
 
         const findUser = await usersDAO.findUserById(idUser)
         if (!findUser) {
-            return CustomError.createError({
-                name: 'User data error',
+            throw CustomError.createError({
+                name: 'UserError',
                 cause: '',
-                message: 'The user is not found',
+                message: 'El usuario no se encuentra registrado',
                 code: ErrorCodes.NOT_FOUND
             })
         }
 
         if (orderType === 'En mesa' && !tableNumber) {
-            return CustomError.createError({
-                name: 'Cart data error',
+            throw CustomError.createError({
+                name: 'OrderTableProblem',
                 cause: '',
                 message: 'Para ordenar en mesa es obligatorio numero de mesa',
                 code: ErrorCodes.MISSING_REQUIRED_FIELDS
@@ -65,7 +65,7 @@ export class CartsService {
             const findTable = await cartsDAO.getCartInTable(tableNumber, findUser.branch._id)
 
             if (findTable.length > 0) {
-                return CustomError.createError({
+                throw CustomError.createError({
                     name: 'Cart table error',
                     cause: '',
                     message: `La mesa número ${tableNumber} ya está ocupada.`,
@@ -80,11 +80,9 @@ export class CartsService {
             let productInStock = await productsDAO.findProductById(product.pid);
 
 
-            if (productInStock.stock < product.quantity) return CustomError.createError({
-                name: 'Cart data error',
+            if (productInStock.stock < product.quantity) throw CustomError.createError({
+                name: 'CartStockError',
                 cause: '',
-                // message: `Problema de stock ${productInStock.nombre}`,
-                // message: `La cantidad ordenada (${product.quantity}) supera el stock disponible(${productInStock.stock}) para el producto ${productInStock.nombre}.`,
                 message: `El producto ${productInStock.nombre} con cantidad ordenada (${product.quantity}) supera el stock disponible(${productInStock.stock}).`,
                 code: ErrorCodes.OUT_OF_STOCK
             })
@@ -92,28 +90,13 @@ export class CartsService {
             const newStock = productInStock.stock - product.quantity;
             const prodUpdate = await productsDAO.updateStockQuantity(productInStock._id, product.quantity);
             if (!prodUpdate) {
-                return CustomError.createError({
-                    name: 'Cart data error',
+                throw CustomError.createError({
+                    name: 'CartStockError',
                     cause: '',
                     message: `Problema al actualizar catidad en producto`,
                     code: ErrorCodes.NOT_FOUND
                 })
             }
-
-            // if (productInStock.stock < product.quantity) {
-            //     insufficientStockProducts.push({
-            //         pid: product.pid,
-            //         quantity: product.quantity,
-            //         stock: productInStock.stock
-            //     });
-            // } else {
-            //     // prodsSell.push( product.pid)
-            //     prodsSell.push({ product: product.pid, quantity: product.quantity })
-            //     productInStock.stock -= product.quantity;
-            //     // await productInStock.save();
-            //     await cartsDAO.productInStockSave(productInStock)
-            //     cantiadTotal += product.quantity * productInStock.precio;
-            // }
         }
 
         const cartUsr = { ...cart, user: idUser, status: 'created', customer, totalPrice, branch, tableNumber, orderType }
@@ -121,6 +104,14 @@ export class CartsService {
 
 
         const cartCreado = await cartsDAO.createCart(cartUsr)
+        if (!cartCreado) {
+            throw CustomError.createError({
+                name: 'CartCreateError',
+                cause: '',
+                message: `Problema al crear el carrito`,
+                code: ErrorCodes.INTERNAL_SERVER_ERROR
+            })
+        }
         return cartCreado
 
     }
@@ -130,10 +121,10 @@ export class CartsService {
 
         const carts = await cartsDAO.getCarts()
         if (!carts)
-            return CustomError.createError({
-                name: 'User data error',
+            throw CustomError.createError({
+                name: 'CartsNotFoundError',
                 cause: '',
-                message: 'The user is not found',
+                message: 'No hay carritos disponibles',
                 code: ErrorCodes.NOT_FOUND
             })
         return carts
@@ -141,30 +132,59 @@ export class CartsService {
 
     async getUserCarts(uid) {
 
+        if (!uid)
+            throw CustomError.createError({
+                name: 'UserDataError',
+                cause: '',
+                message: 'Verificar usuario',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+
         const user = await usersService.findUserById(uid)
         if (!user)
-            return CustomError.createError({
-                name: 'User data error',
+            throw CustomError.createError({
+                name: 'UserError',
                 cause: '',
-                message: 'The user is not found',
+                message: 'El usuario no existe',
                 code: ErrorCodes.NOT_FOUND
             })
         const carts = await cartsDAO.getUserCarts(uid)
+        if (!carts)
+            throw CustomError.createError({
+                name: 'UserError',
+                cause: '',
+                message: 'No hay carritos con ese cliente',
+                code: ErrorCodes.NOT_FOUND
+            })
         return carts
 
 
     }
     async getAllUserCarts(uid) {
+        if (!uid)
+            throw CustomError.createError({
+                name: 'UserDataError',
+                cause: '',
+                message: 'Verificar usuario',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
 
         const user = await usersService.findUserById(uid)
         if (!user)
-            return CustomError.createError({
-                name: 'User data error',
+            throw CustomError.createError({
+                name: 'UserError',
                 cause: '',
-                message: 'The user is not found',
+                message: 'El usuario no existe',
                 code: ErrorCodes.NOT_FOUND
             })
         const carts = await cartsDAO.getAllUserCarts(uid)
+        if (!carts)
+            throw CustomError.createError({
+                name: 'CartError',
+                cause: '',
+                message: 'No hay carritos ',
+                code: ErrorCodes.NOT_FOUND
+            })
         return carts
 
 
@@ -172,15 +192,30 @@ export class CartsService {
 
     async getUserCartsInBranch(uid, bid) {
 
+        if (!uid || !bid)
+            throw CustomError.createError({
+                name: 'DataError',
+                cause: '',
+                message: '',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+
         const user = await usersService.findUserById(uid)
         if (!user)
-            return CustomError.createError({
-                name: 'User data error',
+            throw CustomError.createError({
+                name: 'UserError',
                 cause: '',
-                message: 'The user is not found',
+                message: 'El usuario no existe',
                 code: ErrorCodes.NOT_FOUND
             })
         const carts = await cartsDAO.getUserCartsInBranch(uid, bid)
+        if (!carts)
+            throw CustomError.createError({
+                name: 'CartError',
+                cause: '',
+                message: 'No hay carritos ',
+                code: ErrorCodes.NOT_FOUND
+            })
         return carts
 
 
@@ -188,12 +223,21 @@ export class CartsService {
 
     async getCartById(cid) {
 
+        if (!cid) {
+            throw CustomError.createError({
+                name: 'DataError',
+                cause: '',
+                message: 'Verificar carrito existente',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
+
         const cart = await cartsDAO.getCartById(cid)
         if (!cart) {
             return CustomError.createError({
-                name: 'Cart data error',
+                ame: 'CartError',
                 cause: '',
-                message: 'The cart is not found',
+                message: 'No hay carritos ',
                 code: ErrorCodes.NOT_FOUND
             })
         }
@@ -206,9 +250,9 @@ export class CartsService {
         // Verificar que el ID del carrito no esté vacío
         if (!cid) {
             return CustomError.createError({
-                name: 'Cart data error',
+                name: 'DataError',
                 cause: '',
-                message: 'The cart is not found',
+                message: 'Verificar datos ',
                 code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
         }
@@ -217,7 +261,7 @@ export class CartsService {
         const carFind = await cartsDAO.getCartById(cartId);
         if (!carFind) {
             return CustomError.createError({
-                name: 'Cart data error',
+                name: 'CartError',
                 cause: '',
                 message: `El carrito con ID ${cid} no existe`,
                 code: ErrorCodes.NOT_FOUND
@@ -243,20 +287,20 @@ export class CartsService {
 
     async UpdateCartById(cid, cart, totalPrice, orderType, tableNumber) {
 
-        if (!cid || !cart) {
-            return CustomError.createError({
-                name: 'Cart data error',
+        if (!cid || !cart || !totalPrice || !orderType || !tableNumber) {
+            throw CustomError.createError({
+                name: 'DataError',
                 cause: '',
                 message: `Error en los datos`,
-                code: ErrorCodes.NOT_FOUND
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
         }
 
         //Obtiene carrito de la bd
         const existingCart = await cartsDAO.getCartById(cid)
         if (!existingCart) {
-            return CustomError.createError({
-                name: 'Cart data error',
+            throw CustomError.createError({
+                name: 'CartError',
                 cause: '',
                 message: `Carrito no encontrado`,
                 code: ErrorCodes.NOT_FOUND
@@ -293,8 +337,8 @@ export class CartsService {
                     const dif = existingProduct.quantity - product.quantity
                     const prodUpdate = await productsDAO.updateAddStockQuantity(stockCheck._id, dif);
                     if (!prodUpdate) {
-                        return CustomError.createError({
-                            name: 'Cart data error',
+                        throw CustomError.createError({
+                            name: 'ProductError',
                             cause: '',
                             message: `Problema al actualizar catidad en producto`,
                             code: ErrorCodes.NOT_FOUND
@@ -316,8 +360,8 @@ export class CartsService {
                 const stockCheck = await productsDAO.findProductByIdd(product.pid);
 
                 if (stockCheck.stock < additionalQuantity) {
-                    return CustomError.createError({
-                        name: 'Cart update error',
+                    throw CustomError.createError({
+                        name: 'Cartupdate error',
                         cause: '',
                         message: `No hay suficiente stock para ${stockCheck.nombre}.`,
                         code: ErrorCodes.OUT_OF_STOCK
@@ -329,8 +373,8 @@ export class CartsService {
 
                 const prodUpdate = await productsDAO.updateStock(stockCheck._id, newStock);
                 if (!prodUpdate) {
-                    return CustomError.createError({
-                        name: 'Cart data error',
+                    throw CustomError.createError({
+                        name: 'Cart',
                         cause: '',
                         message: `Problema al actualizar catidad en producto`,
                         code: ErrorCodes.NOT_FOUND
@@ -340,7 +384,7 @@ export class CartsService {
                 // Si no coincide en propiedades, agregar como nuevo producto
                 const stockCheck = await productsDAO.findProductById(product.pid);
                 if (stockCheck.stock < product.quantity) {
-                    return CustomError.createError({
+                    throw CustomError.createError({
                         name: 'Cart update error',
                         cause: '',
                         message: `No hay suficiente stock para ${stockCheck.nombre}.`,
@@ -351,7 +395,7 @@ export class CartsService {
                 // Añadir al carrito y deducir stock
                 const prodUpdate = await productsDAO.updateStockQuantity(stockCheck._id, product.quantity);
                 if (!prodUpdate) {
-                    return CustomError.createError({
+                    throw CustomError.createError({
                         name: 'Cart data error',
                         cause: '',
                         message: `Problema al actualizar catidad en producto`,
@@ -366,8 +410,14 @@ export class CartsService {
 
 
         const updateCart = await cartsDAO.UpdateCartById(cid, cart, totalPrice, orderType, tableNumber)
-        // const updateCart = await cartsDAO.UpdateCartById(cid, existingCart)
-        // console.log('updateCart------ ', updateCart)
+        if (!updateCart) {
+            throw CustomError.createError({
+                name: 'CartError',
+                cause: '',
+                message: `Problema al actualizar carrito`,
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
 
         return updateCart
 
@@ -375,7 +425,7 @@ export class CartsService {
 
     async empyCart(cid) {
         if (!cid) {
-            return CustomError.createError({
+            throw CustomError.createError({
                 name: 'Cart data error',
                 cause: '',
                 message: 'The cart is not found to empty',
@@ -388,7 +438,7 @@ export class CartsService {
 
 
         if (cartFind.products.length === 0 && cartFind.status === 'empty')
-            return CustomError.createError({
+            throw CustomError.createError({
                 name: 'Cart data error',
                 cause: '',
                 message: 'the card is already empty',
@@ -413,27 +463,43 @@ export class CartsService {
 
     async addProductToCart(cid, pid, quantity) {
 
-        //verifica que el producto y el carrito existan
-        const carFind = await cartsDAO.getCartByIdStatusCreated(cid);
-        const productFind = await productsDAO.findProductById(pid);
-
-
-        if (!carFind || !productFind)
-            return CustomError.createError({
-                name: 'Cart data error',
+        if (!cid || !pid || !quantity)
+            throw CustomError.createError({
+                name: 'DataError',
                 cause: '',
                 message: 'Verifique datos a mandar',
                 code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
 
+        //verifica que el producto y el carrito existan
+        const carFind = await cartsDAO.getCartByIdStatusCreated(cid);
+        
+        if (!carFind)
+            throw CustomError.createError({
+                name: 'CartFindError',
+                cause: '',
+                message: 'Problemas al seleccionar carrito',
+                code: ErrorCodes.NOT_FOUND
+            })
+
+        const productFind = await productsDAO.findProductById(pid);
+
+        if (!productFind)
+            throw CustomError.createError({
+                name: 'ProductFindError',
+                cause: '',
+                message: 'Producto no encontrado',
+                code: ErrorCodes.NOT_FOUND
+            })
+        
 
         // // Buscar si el producto ya está en el carrito
         const existingProduct = carFind.products.find(p => p.pid.equals(pid));
         if (existingProduct) {
             const cartUpd = cartsDAO.addCountToProductCart(cid, pid, quantity)
             if (!cartUpd)
-                return CustomError.createError({
-                    name: 'Cart data error',
+                throw CustomError.createError({
+                    name: 'CartUpdateQuantityError',
                     cause: '',
                     message: 'Error al actualizar catidad',
                     code: ErrorCodes.NOT_FOUND
@@ -442,10 +508,10 @@ export class CartsService {
         } else {
             const cartUpd = cartsDAO.createProducInCart(cid, pid, quantity)
             if (!cartUpd)
-                return CustomError.createError({
-                    name: 'Cart data error',
+                throw CustomError.createError({
+                    name: 'ProductInCartError',
                     cause: '',
-                    message: 'Error to create product in cart',
+                    message: 'Error al crear el producto al carrito',
                     code: ErrorCodes.NOT_FOUND
                 })
             return cartUpd
@@ -462,7 +528,7 @@ export class CartsService {
     async deleteProductCart(cid, pid) {
 
         if (!cid || !pid)
-            return CustomError.createError({
+            throw CustomError.createError({
                 name: 'Cart data error',
                 cause: '',
                 message: 'Verifique datos a mandar',
@@ -475,7 +541,7 @@ export class CartsService {
         const productFind = await productsDAO.findProductById(pid);
 
         if (!carFind || !productFind)
-            return CustomError.createError({
+            throw CustomError.createError({
                 name: 'Cart data error',
                 cause: '',
                 message: 'The card or product is not found',
@@ -489,7 +555,7 @@ export class CartsService {
         const productIndex = carFind.products.findIndex(p => p.pid.equals(pid));
 
         if (productIndex === -1) {
-            return CustomError.createError({
+            throw CustomError.createError({
                 name: 'Cart data error',
                 cause: '',
                 message: 'The product is not exists in the cart',
@@ -520,12 +586,21 @@ export class CartsService {
 
         // Verifica que el carrito exista y sea del usuario logeado
         // const cart = await cartModel.findOne({ _id: cid, user: uid, status: 'created' }).populate('products.pid');
+
+        if (!cid || !uid)
+            return CustomError.createError({
+                name: 'DataError',
+                cause: '',
+                message: 'Verifique datos a mandar',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+
         const cart = await cartsDAO.verifyCartOfUser(cid, uid)
         if (!cart)
             return CustomError.createError({
-                name: 'Cart data error',
+                name: 'CartUserError',
                 cause: '',
-                message: 'Cart not find or user have not permissions',
+                message: 'Carrito no encontrado o el usuario no tiene permisos',
                 code: ErrorCodes.INVALID_CREDENTIALS
             })
 
@@ -548,20 +623,20 @@ export class CartsService {
         // uid, customer, cid, productsSell, cantidadTotal
         if (!ticket)
             return CustomError.createError({
-                name: 'Cart data error',
+                name: 'TicketError',
                 cause: '',
-                message: 'Error to create the tiket',
-                code: ErrorCodes.INVALID_CREDENTIALS
+                message: 'Error al crear el ticket',
+                code: ErrorCodes.NOT_FOUND
             })
 
         //Actualiza el estado a Finalizado
         const updatedCart = cartsDAO.UpdCartToFinalized(cid)
         if (!updatedCart)
             return CustomError.createError({
-                name: 'Cart data error',
+                name: 'CartError',
                 cause: '',
-                message: 'Error al actualizar a status: finalized ',
-                code: ErrorCodes.INVALID_CREDENTIALS
+                message: 'Error al actualizar carrito a status: finalized ',
+                code: ErrorCodes.NOT_FOUND
             })
 
         await cartsDAO.cartSave(cart) //Guarda en BD
@@ -575,7 +650,7 @@ export class CartsService {
                     // to: cart.customer.email,
                     subject: "Ticket de compra",
                     html: templateHtmlCarrito(cart),
-                    attachments: [        
+                    attachments: [
                         {
                             filename: 'meme.jpg',
                             path: `public/img/logoSl.png`,
@@ -584,14 +659,14 @@ export class CartsService {
                         }
                     ]
                 })
-                
+
             } catch (error) {
                 console.error('Error al enviar comprobante por correo', error);
             }
-            
-            
+
+
         }
-        
+
 
         return ticket
         // }
@@ -604,28 +679,46 @@ export class CartsService {
 
     async getCustomerCarts(cid) {
 
-        const cart = await cartsDAO.getCustomerCarts(cid)
-        if (!cart) {
+        if (!cid) {
             return CustomError.createError({
-                name: 'Cart data error',
+                name: 'DataError',
                 cause: '',
-                message: 'The cart is not found',
+                message: 'Verificar cliente',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
+
+        const carts = await cartsDAO.getCustomerCarts(cid)
+        if (!carts) {
+            return CustomError.createError({
+                name: 'CartError',
+                cause: '',
+                message: 'No hay carritos disponibles',
                 code: ErrorCodes.NOT_FOUND
             })
         }
-        return cart
+        return carts
 
     }
 
 
     async UpdCartToCanceled(cid) {
 
+        if (!cid) {
+            return CustomError.createError({
+                name: 'DataError',
+                cause: '',
+                message: 'Verificar carrito',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
+
         const existingCart = await cartsDAO.getCartById(cid)
         if (!existingCart) {
             return CustomError.createError({
-                name: 'Cart data error',
+                name: 'CartError',
                 cause: '',
-                message: 'The cart is not found',
+                message: 'El carrito no existe',
                 code: ErrorCodes.NOT_FOUND
             })
         }
@@ -633,9 +726,9 @@ export class CartsService {
             const prodQauantityUpdate = await productsDAO.updateAddStockQuantity(prod.pid, prod.quantity);
             if (!prodQauantityUpdate) {
                 return CustomError.createError({
-                    name: 'Cart update quantity error',
+                    name: 'ProductUpdateError',
                     cause: '',
-                    message: 'The cart can not increment quantity',
+                    message: 'Problemas al actualizar catidad del producto',
                     code: ErrorCodes.NOT_FOUND
                 })
             }
@@ -646,9 +739,9 @@ export class CartsService {
         const cart = await cartsDAO.UpdCartToCanceled(cid)
         if (!cart) {
             return CustomError.createError({
-                name: 'Cart data error',
+                name: 'CartError',
                 cause: '',
-                message: 'The cart is not found',
+                message: 'Problemas al cancelar el carrito',
                 code: ErrorCodes.NOT_FOUND
             })
         }
@@ -658,23 +751,32 @@ export class CartsService {
 
     async getTablesOccupied(userId) {
 
+        if (!userId) {
+            throw CustomError.createError({
+                name: 'UserDataError',
+                cause: '',
+                message: 'Verificar usuario',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
+
         const user = await usersDAO.findUserById(userId)
         if (!user) {
-            return CustomError.createError({
-                name: 'User error',
+            throw CustomError.createError({
+                name: 'UserFindError',
                 cause: '',
-                message: 'User not found',
+                message: 'Usuario no encontrado',
                 code: ErrorCodes.NOT_FOUND
             })
         }
         // console.log(user.branch._id);
-        
+
         const tablesOccupied = await cartsDAO.getTablesOccupied(user.branch._id)
         if (!tablesOccupied) {
-            return CustomError.createError({
-                name: 'Cart data error',
+            throw CustomError.createError({
+                name: 'TablesError',
                 cause: '',
-                message: 'Available tables not found',
+                message: 'No hay mesas ocupadas',
                 code: ErrorCodes.NOT_FOUND
             })
         }

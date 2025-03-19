@@ -176,14 +176,13 @@ export default class CartsManager {
     }
 
     async createProducInCart(cid, pid, quantity) {
-        const productId = new mongoose.Types.ObjectId(pid); // Convierte pid a ObjectId
         try {
             const cart = await cartModel.findOneAndUpdate(
                 { _id: cid },
-                { $push: { products: { pid: pid, quantity: quantity } } }, // Agregar nuevo producto con cantidad 1
+                { $push: { products: { pid: pid, quantity: quantity } } }, // Agregar nuevo producto con cantidad 
                 { new: true, upsert: true }
             ).populate('products.pid')
-
+            
             if (!cart) return null
 
             return cart

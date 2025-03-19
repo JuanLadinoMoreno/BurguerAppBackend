@@ -22,22 +22,22 @@ export default class CustomersService {
             !email
         ) {
             CustomError.createError({
-                name: 'Customer data error',
+                name: 'CustomerDataError',
                 // cause: generateInvalidUserDataError({ firstName, lastName, phone, email }),
                 cause: '',
-                message: 'Data error trying to create a new customer',
-                code: ErrorCodes.INVALID_TYPES_ERROR
+                message: 'Verefique datos del cliente',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
         }
 
-        const userExist = await customersDAO.getCustomerByEmail(email);
-        if (userExist) {
+        const customerExist = await customersDAO.getCustomerByEmail(email);
+        if (customerExist) {
             // throw new Error('El usuario ya existe');
 
             CustomError.createError({
-                name: 'Error register email customer',
+                name: 'CustomerError',
                 cause: '',
-                message: 'The customer is already registered',
+                message: 'El cliente ya ha sido registrado',
                 code: ErrorCodes.EXISTING_DATA
             })
 
@@ -56,6 +56,15 @@ export default class CustomersService {
     async getCustomers() {
 
         const customers = await customersDAO.getCustomers()
+        if (!customers) {
+            return CustomError.createError({
+                name: 'CustomerError',
+                cause: '',
+                message: 'Problemas al obtener clientes',
+                code: ErrorCodes.INVALID_CREDENTIALS
+            })
+        }
+
         return customers
 
     }
@@ -63,22 +72,22 @@ export default class CustomersService {
     async getCustomerById(id) {
         if (!id) {
             return CustomError.createError({
-                name: 'Customer id error',
+                name: 'CustomerDataError',
                 cause: '',
-                message: 'Verify customer id',
-                code: ErrorCodes.INVALID_CREDENTIALS
+                message: 'Verifique el id del usuario',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
 
         }
 
-        const userFound = await customersDAO.getCustomerById(id)
+        const customerFound = await customersDAO.getCustomerById(id)
 
-        if (!userFound) {
+        if (!customerFound) {
             return CustomError.createError({
-                name: 'User data error',
+                name: 'CustomerError',
                 cause: '',
-                message: 'User not found',
-                code: ErrorCodes.INVALID_CREDENTIALS
+                message: 'Error a obtener cliente',
+                code: ErrorCodes.NOT_FOUND
             })
         }
 
@@ -89,15 +98,25 @@ export default class CustomersService {
     async updateCustomerById(id, customer) {
         // try {
         const cid = new mongoose.Types.ObjectId(id)
+        
+        if(!id, !customer){
+
+            return CustomError.createError({
+                name: 'CustomerDataError',
+                cause: '',
+                message: 'Verifique los datos',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
 
         const customerFind = await customersDAO.getCustomerById(cid)
 
         if(!customerFind){
 
             return CustomError.createError({
-                name: 'Product data error',
+                name: 'CustomerError',
                 cause: '',
-                message: 'The customer is not exists',
+                message: 'El cliente no existe registrado',
                 code: ErrorCodes.NOT_FOUND
             })
         }
@@ -106,9 +125,9 @@ export default class CustomersService {
 
         if (!customerUpd)
             return CustomError.createError({
-                name: 'Product update error',
+                name: 'CustomerError',
                 cause: '',
-                message: 'The product can not be updated',
+                message: 'El cliente no pudo ser actualizado',
                 code: ErrorCodes.EXISTING_DATA
             })
         const customerUpdDTO = new customersDto(customerUpd)
@@ -122,16 +141,33 @@ export default class CustomersService {
     }
 
     async deleteCustomerById(id) {
+        if (!id) {
+            return CustomError.createError({
+                name: 'CustomerIdError',
+                cause: '',
+                message: 'Verifique el usuario',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
         const customerFound = await customersDAO.getCustomerById(id);
         if (!customerFound) {
             return CustomError.createError({
-                name: 'User id error',
+                name: 'CustomerError',
                 cause: '',
-                message: 'the user is not exist',
-                code: ErrorCodes.INVALID_CREDENTIALS
+                message: 'El cliente no existe registrado',
+                code: ErrorCodes.NOT_FOUND
             })
         }
-        return await customersDAO.deleteCustomerById(id);
+        const customerDelete = await customersDAO.deleteCustomerById(id);
+        if (!customerDelete) {
+            return CustomError.createError({
+                name: 'CustomerDeleteError',
+                cause: '',
+                message: 'Porblema al eliminar cliente',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+        return customerDelete
     }
 
 }

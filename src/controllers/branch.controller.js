@@ -5,10 +5,10 @@ const branchService = new BranchService()
 export const getBranch = async (req, res) => {
     
     try {
-        const products = await branchService.getBranch();
-        if (!products) return res.json({ status: 'error', message: 'Products null' })
+        const branch = await branchService.getBranch();
+        if (!branch) return res.status(404).json({ status: 'error', message: 'Sucursales no encontradas' })
 
-        res.status(200).json({ status: 'success', payload: products })
+        res.status(200).json({ status: 'success', payload: branch })
     } catch (error) {
         // return res.status(500).json({ status: error,  message: error.message });
         next(error)
@@ -37,7 +37,7 @@ export const getBranchAvailable = async (req, res) => {
     
     try {
         const branch = await branchService.getBranchAvailable();
-        if (!branch) return res.json({ status: 'error', message: 'Branch null' })
+        if (!branch) return res.status(404).json({ status: 'error', message: 'Sucuarsales no encontradas' })
 
         res.status(200).json({ status: 'success', payload: branch })
     } catch (error) {
@@ -51,8 +51,8 @@ export const updateBranchById = async (req, res, next) => {
         const bid = req.params.bid
         const branch = req.body
         const branchUpd = await branchService.updateBranchById(bid, branch)
-        if(!branchUpd) return res.json({status: 'error', message: 'Branch null'})
-        res.status(201).json({status: 'success', payload: branchUpd})
+        if(!branchUpd) return res.status(404).json({status: 'error', message: 'Sucursal no encontrada o no se pudo actualizar la sucursal'})
+        res.status(200).json({status: 'success', payload: branchUpd})
     } catch (error) {
         next(error)
     }

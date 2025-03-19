@@ -49,6 +49,9 @@ export const errorHandler = (error, req, res, next) => {
         case ErrorCodes.PAYMENT_FAILED:
             res.status(402).send({ status: 'error', error: error.message });
             break;
+        case ErrorCodes.INTERNAL_SERVER_ERROR:
+            res.status(500).send({ status: 'error', error: error.message });
+            break;
         default:
             res.status(500).send({ status: 'error', error: 'Unknown error' });
     }

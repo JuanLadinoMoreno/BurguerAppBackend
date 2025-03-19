@@ -50,10 +50,8 @@ export default class CustomersDAO{
 
     async getCustomerById(id){
         try {
+            if(!id) return null
             const userFound = await customerModel.findById(id);
-
-            if(!userFound) return null
-
             return userFound;            
         } catch (error) {
             console.log('Error ', error);

@@ -7,8 +7,8 @@ const categoriesManager = new ProductsCategoriesService ()
 export const getCatProducts = async (req, res) => {
     try{
         const products = await categoriesManager.getCategories();
-        // res.status(200).json(products)
-        res.status(200).json({status: 'seccess', payload: products})
+        if(!products) return res.status(404).json({status: 'error', message: 'Categorias no encontradas'})
+        res.status(200).json({status: 'success', payload: products})
 
     }catch(error){
         console.log(error);

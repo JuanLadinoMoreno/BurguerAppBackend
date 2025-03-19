@@ -183,7 +183,6 @@ export const deleteUserInactive = async (req, res, next) => {
 export const notifyInactiveUsers = async (req, res, next) => {
     try {
         const users = await emailService.notifyInactiveUsers();
-        if (!users) return res.status(500).json({ status: 'error', message: 'Error al eliminar y enviar correos' })
 
         res.status(200).json({ status: 'success', payload: users })
     } catch (error) {
@@ -195,11 +194,13 @@ export const notifyInactiveUsers = async (req, res, next) => {
 
 //correo de recuperacion
 export const solicitudPaswordReset = async (req, res, next) => {
+    console.log('ksljdlfkjsdlfkjsldkjflkj');
     try {
+        // const email = req.params.email
         const { email } = req.body
         const token = await usersService.solicitudPaswordReset(email)
-        if (!token)
-            return res.status(500).json({ status: 'error', message: 'Error al solicitar cambio de contraseña' })
+        // if (!token)
+        //     return res.status(500).json({ status: 'error', message: 'Error al solicitar cambio de contraseña' })
 
 
         res.cookie("tokenResetPass", token, {
@@ -211,7 +212,7 @@ export const solicitudPaswordReset = async (req, res, next) => {
         return res.status(200).json({ status: 'success', message: 'Correo enviado con éxito' })
 
     } catch (error) {
-        console.log(error);
+        console.log('ksljdlfkjsdlfkjsldkjflkj', error);
         next(error)
     }
 }

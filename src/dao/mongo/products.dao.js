@@ -9,15 +9,11 @@ export default class productsDAO {
     async getProducts() {
         try {
             const productos = await productModel.find().populate('user');
-            
-
-            // Para traer productos creados por el usuario            
-            // const productos = await productModel.find({ user: id}).populate('user');
 
             return productos.map(p => p.toObject({ virtuals: true }))
 
         } catch (error) {
-            console.log(error);
+            console.log('Error al obtener los productos de la BD', error);
             return null
         }
     }
@@ -30,7 +26,7 @@ export default class productsDAO {
 
             return product.toObject({ virtuals: true });
         } catch (error) {
-            console.log('error  ->', error);
+            console.log(`Problemas al encontar producto con el ID: ${id}`, error);
             return null
         }
     }
@@ -83,24 +79,19 @@ export default class productsDAO {
         }
     }
 
-    // async deleteProduct(id = '6619a998eacc45356e34ea2c') {
     async deleteProduct(id) {
         try {
-            
             const prod = await productModel.findByIdAndDelete(id)
             return prod
 
         } catch (err) {
             console.log(err);
-            // return [];
         }
     }
 
     async getProductsByCategory(ids){
         try {
             const productosByCategory = await  productModel.find({tipo: ids});
-            // console.log('datos', datos)
-            // return datos
             return productosByCategory.map(p => p.toObject())
             
         } catch (error) {

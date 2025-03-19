@@ -27,11 +27,11 @@ export default class usersService {
             !tipo ||
             !branch
         ) {
-            CustomError.createError({
-                name: 'User data error',
+           throw CustomError.createError({
+                name: 'UserDataError',
                 cause: generateInvalidUserDataError({ firstName, lastName, age, email, password, tipo, branch }),
-                message: 'Data error trying to create a new user',
-                code: ErrorCodes.INVALID_TYPES_ERROR
+                message: 'Verifique los datos de usuario',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
         }
 
@@ -39,25 +39,30 @@ export default class usersService {
         if (userExist) {
             // throw new Error('El usuario ya existe');
 
-            CustomError.createError({
-                name: 'Error register email user',
+            throw CustomError.createError({
+                name: 'ErrorUser',
                 cause: '',
-                message: 'The user is already registered',
+                message: 'El usuario ya esta registrado',
                 code: ErrorCodes.EXISTING_DATA
             })
 
         }
-
+        
         const pswHash = await bcryptjs.hash(password, 11)
-
+        
         const usr = await UsersDAO.createUser(firstName, lastName, age, email, pswHash, tipo, branch)
+        if (!usr) {
+            throw CustomError.createError({
+                name: 'ErrorUserCreated',
+                cause: '',
+                message: 'Error al crear usuario',
+                code: ErrorCodes.INTERNAL_SERVER_ERROR
+            })
+
+        }
+
         const userDTO = new usersDto(usr)
         return userDTO
-
-        // } catch (error) {
-        //     console.log('Error al crear usuariodasdasdasdadad', error);
-        //     return null
-        // }
     }
 
     async onLogin(email, password) {
@@ -66,11 +71,11 @@ export default class usersService {
 
         if (!email || !password) {
 
-            CustomError.createError({
-                name: 'User data error',
+            throw CustomError.createError({
+                name: 'DataError',
                 cause: '',
-                message: 'Error email / password, trying to login user',
-                code: ErrorCodes.INVALID_CREDENTIALS
+                message: 'Error en email / contraseña, verifique datos',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
         }
 
@@ -79,22 +84,22 @@ export default class usersService {
         const userFound = await UsersDAO.getUserByEmail(email);
 
         if (!userFound) {
-            return CustomError.createError({
-                name: 'User data error',
+            throw CustomError.createError({
+                name: 'UserDataError',
                 cause: '',
-                message: 'User not found',
-                code: ErrorCodes.INVALID_CREDENTIALS
+                message: 'Usuario no registrado',
+                code: ErrorCodes.NOT_FOUND
             })
         }
 
         const isMatch = await bcryptjs.compare(password, userFound.password);
         if (!isMatch) {
 
-            return CustomError.createError({
-                name: 'User password error',
+            throw CustomError.createError({
+                name: 'UserPasswordError',
                 cause: '',
-                message: 'The password is not macth',
-                code: ErrorCodes.IVALIT_CREDENTALS
+                message: 'Contraseña incorrecta',
+                code: ErrorCodes.INVALID_CREDENTIALS
             })
 
         }
@@ -112,11 +117,11 @@ export default class usersService {
 
     async findUserById(id) {
             if (!id) {
-                return CustomError.createError({
-                    name: 'User id error',
+                throw CustomError.createError({
+                    name: 'UserDataError',
                     cause: '',
-                    message: 'Verify user',
-                    code: ErrorCodes.IVALIT_CREDENTALS
+                    message: 'Verifique datos de usuario',
+                    code: ErrorCodes.MISSING_REQUIRED_FIELDS
                 })
     
             }
@@ -124,11 +129,11 @@ export default class usersService {
             const userFound = await UsersDAO.findUserById(id)
     
             if (!userFound) {
-                return CustomError.createError({
+                throw CustomError.createError({
                     name: 'User data error',
                     cause: '',
                     message: 'User not found',
-                    code: ErrorCodes.INVALID_CREDENTIALS
+                    code: ErrorCodes.NOT_FOUND
                 })
             }
     
@@ -139,26 +144,16 @@ export default class usersService {
     async updateUserById(id, user) {
         const uid = new mongoose.Types.ObjectId(id)
 
-        const userFind = await this.findUserById(uid)
-        
-        // if(!userFind){
-
-        //     return CustomError.createError({
-        //         name: 'Product data error',
-        //         cause: '',
-        //         message: 'The product is not exists',
-        //         code: ErrorCodes.NOT_FOUND
-        //     })
-        // }
+        await this.findUserById(uid)
         
         const userUpd = await UsersDAO.updateUserById(uid, user)
         
         if(!userUpd)
-            return CustomError.createError({
+            throw CustomError.createError({
                 name: 'Product update error',
                 cause: '',
-                message: 'The product can not be updated',
-                code: ErrorCodes.EXISTING_DATA
+                message: 'El usuario no pudo ser actualizado',
+                code: ErrorCodes.NOT_FOUND
             })
         const userUpdDTO = new usersDto(userUpd)
         return userUpdDTO
@@ -167,20 +162,29 @@ export default class usersService {
     async getUsers() {
 
         const users = await UsersDAO.getUsers()
+        if (!users) {
+            throw CustomError.createError({
+                name: 'UsersNotFound',
+                cause: '',
+                message: 'No se encontraron usuarios',
+                code: ErrorCodes.NOT_FOUND
+            });
+        }
         return users
 
     }
 
     async deleteUserInactive(userId) {
-        const userFound = await this.findUserById(userId);
-        if (!userFound) {
-            return CustomError.createError({
-                name: 'User id error',
+        if (!userId) {
+            throw CustomError.createError({
+                name: 'UserIdError',
                 cause: '',
-                message: 'Verify user',
-                code: ErrorCodes.IVALIT_CREDENTALS
+                message: 'Verifique datos de usuario',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
             })
         }
+
+        await this.findUserById(userId);
 
         const lastConnection = moment(userFound.lastConnection);
 
@@ -218,13 +222,23 @@ export default class usersService {
         return await UsersDAO.deleteUserById(userId);
     }
 
-    async solicitudPaswordReset(email) {
-        const userFound = await UsersDAO.getUserByEmail(email)
-        if (!userFound) {
-            return CustomError.createError({
+    async solicitudPaswordReset(email) {        
+
+        if (!email) {
+            throw CustomError.createError({
                 name: 'EmailError',
                 cause: '',
-                message: 'The email is not registered',
+                message: 'Verifique que email sea correcto',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
+        
+        const userFound = await UsersDAO.getUserByEmail(email)
+        if (!userFound) {
+            throw CustomError.createError({
+                name: 'EmailError',
+                cause: '',
+                message: 'El amail no esta registrado',
                 code: ErrorCodes.NOT_FOUND
             })
         }
@@ -261,7 +275,28 @@ export default class usersService {
     }
 
     async resetPassword(uid, password){
-        return await UsersDAO.resetPassword(uid, password)
+        if (!uid, !password) {
+            throw CustomError.createError({
+                name: 'UserDataError',
+                cause: '',
+                message: 'Verifique que los datos sean correctos',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+        }
+        await this.findUserById(uid)
+        
+        const userReset = await UsersDAO.resetPassword(uid, password)
+
+        if (!userReset) {
+            throw CustomError.createError({
+                name: 'ErrorPasswordData',
+                cause: '',
+                message: 'El amail no esta registrado',
+                code: ErrorCodes.NOT_FOUND
+            })
+        }
+        return userReset
+        
     }
 
 }

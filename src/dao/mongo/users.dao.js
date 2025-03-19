@@ -107,7 +107,7 @@ export default class usersDAO{
             const users = await userModel.find();
             return users
         } catch (error) {
-            console.log('Error on login', e);
+            console.log(error);
             return null
         }
     }

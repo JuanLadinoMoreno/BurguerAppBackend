@@ -10,7 +10,6 @@ export const register = async (req, res, next) => {
         
 
         const userFound = await customersService.createCustomer(firstName, lastName, phone, email)
-        console.log(userFound)
         
         // const userFound = await userModel.findOne({ email });
 
@@ -33,8 +32,6 @@ export const register = async (req, res, next) => {
 export const getCustomers = async (req, res, next) => {
     try {
         const customers = await customersService.getCustomers();
-        if(!customers) return res.json({status: 'error', message: 'Customers null'})
-
         res.status(200).json({ status: 'success', payload: customers })
     } catch (error) {
         console.log(error);
@@ -47,8 +44,6 @@ export const getCustomerById = async (req, res, next) => {
     try {
         const cid = req.params.cid
         const customers = await customersService.getCustomerById(cid);
-        if(!customers) return res.json({status: 'error', message: 'Customers null'})
-
         res.status(200).json({ status: 'success', payload: customers })
     } catch (error) {
         console.log(error);
@@ -62,8 +57,6 @@ export const updateCustomerById = async (req, res, next) => {
         const cid = req.params.cid
         const customer = req.body
         const customerUpd = await customersService.updateCustomerById(cid, customer);
-        if(!customerUpd) return res.json({status: 'error', message: 'Customers null'})
-
         res.status(201).json({ status: 'success', payload: customerUpd })
     } catch (error) {
         
