@@ -20,7 +20,7 @@ export class CartsService {
     async createCart(idUser, cart, customer, totalPrice, branch, tableNumber, orderType) {
 
         // try {
-        if (!idUser || !cart || !totalPrice || !branch || !tableNumber || !orderType) {
+        if (!idUser || !cart || !totalPrice || !branch || !orderType) {
             throw CustomError.createError({
                 name: 'CartDataError',
                 cause: '',
