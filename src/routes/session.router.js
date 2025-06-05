@@ -1,15 +1,19 @@
 import { Router } from "express";
 import { authMdw } from "../middlewares/auth.middleware.js";
+import { validateSchema } from "../middlewares/validatorSchema.middleware.js";
+import { loginSchema } from "../validations/users/login.schema.js";
+import { registerSchema } from "../validations/users/register.schema.js";
+import { updateUserSchema } from "../validations/users/update.schema.js";
 import { dash, deleteUserInactive, getUsers, getUsersById, login, logout, notifyInactiveUsers, register, resetPassword, solicitudPaswordReset, updateUser, verifyToken } from "../controllers/session.controller.js";
 
 
 const router = Router()
 
 
-router.post('/register', register)
+router.post('/register', validateSchema(registerSchema), register)
 
 
-router.post('/login', login);
+router.post('/login', validateSchema(loginSchema), login);
 
 
 //el middelware retorna al usuario que fue decodificado en JWT
@@ -24,7 +28,7 @@ router.get('/', getUsers)
 
 router.get('/:uid', getUsersById)
 
-router.put('/:uid', updateUser)
+router.put('/:uid', validateSchema(updateUserSchema), updateUser)
 
 router.delete('/:uid', deleteUserInactive)
 

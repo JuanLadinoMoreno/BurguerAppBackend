@@ -14,9 +14,9 @@ export const register = async (req, res, next) => {
 
     try {
 
-        const { firstName, lastName, email, age, password, tipo, branch } = req.body
+        const { firstName, lastName, email, age, password, role, branch } = req.body
 
-        const userFound = await usersService.createUser(firstName, lastName, age, email, password, tipo, branch)
+        const userFound = await usersService.createUser(firstName, lastName, age, email, password, role, branch)
 
         // const userFound = await userModel.findOne({ email });
 
