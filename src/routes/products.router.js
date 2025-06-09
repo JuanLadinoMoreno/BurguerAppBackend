@@ -20,7 +20,7 @@ router.get('/:id', authMdw,  getProductById);
 router.post('/', authMdw, verifyAdminPremRoleMdw, validateSchema(createProductSchema), createProduct)
 
 //El usuario admin solo puede actue productos
-router.put('/:id', authMdw, verifyAdminRoleMdw, editProduct)
+router.put('/:id', authMdw, verifyAdminRoleMdw, validateSchema(createProductSchema), editProduct)
 
 //El usuario admin solo puede crear productos
 router.delete('/:id', authMdw, verifyAdminPremRoleMdw, deleteProduct)
