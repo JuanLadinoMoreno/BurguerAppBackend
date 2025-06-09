@@ -2,7 +2,8 @@ import { Router } from 'express'
 import { authMdw } from '../middlewares/auth.middleware.js';
 import { createProduct, deleteProduct, editProduct, getProductById, getProducts, getProductsByCat } from '../controllers/products.controller.js';
 import { verifyAdminPremRoleMdw, verifyAdminRoleMdw } from '../middlewares/verifyRole.middleware.js';
-
+import { validateSchema } from "../middlewares/validatorSchema.middleware.js";
+import { createProductSchema } from "../validations/products/create.schema.js";
 
 
 
@@ -16,7 +17,7 @@ router.get('/', authMdw, getProducts);
 router.get('/:id', authMdw,  getProductById);
 
 //El usuario admin solo puede crear productos
-router.post('/', authMdw, verifyAdminPremRoleMdw, createProduct)
+router.post('/', authMdw, verifyAdminPremRoleMdw, validateSchema(createProductSchema), createProduct)
 
 //El usuario admin solo puede actue productos
 router.put('/:id', authMdw, verifyAdminRoleMdw, editProduct)
