@@ -30,6 +30,16 @@ const ingredienteRevolcadoSchema = z.object({
     }),
 });
 
+const categoryValues = ['comida','bebida','snack']
+
+const categorySchema = z.string({
+    required_error: "Categoria es requerida",
+    invalid_type_error: "Categoria debe ser un string",
+}).refine((val) => categoryValues.includes(val), {
+    message: "Categoria debe ser una categoría válida",
+});
+
+
 const tipoValues = [
     'burguerP', 'bagP', 'sandP', 'hotdogP', 'burgerpP',
     'burrP', 'bebidasF', 'bebidasC', 'snacksP'
@@ -63,11 +73,7 @@ export const createProductSchema = z.object({
             required_error: "Precio es requerido",
             message: "Precio debe ser número positivo"
         }),
-    categoria: z
-        .string({
-            required_error: "Categoria es requerida",
-            message: "Precio debe ser categoria valida"
-        }),
+    categoria: categorySchema,
     tipo: tipoSchema,
     vegetales: z.array(z.string()).optional(),
     status: z.boolean(),
