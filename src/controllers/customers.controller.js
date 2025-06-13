@@ -7,6 +7,7 @@ export const register = async (req, res, next) => {
     try {        
 
         const { firstName, lastName, phone, email } = req.body
+        console.log(firstName, lastName, phone, email);
         
 
         const userFound = await customersService.createCustomer(firstName, lastName, phone, email)
