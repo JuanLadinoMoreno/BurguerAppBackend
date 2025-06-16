@@ -1,20 +1,8 @@
 import mongoose from "mongoose";
-// import CartsManager from "../dao/dbManager/CartsManager.js";
 import CartsManager from "../dao/mongo/carts.dao.js";
-import UserManager from "../dao/mongo/users.dao.js";
 import { CartsService } from "../services/carts.services.js";
-// import { usersService } from "../services/users.services.js";
-import UsersService from "../services/users.services.js";
-
-
-
-// import userModel from "../dao/mongo/models/user.model.js";
-
 const cartsManager = new CartsManager()
-const userManager = new UserManager()
-
 const cartsService = new CartsService()
-const usersService = new UsersService()
 
 
 
@@ -23,10 +11,7 @@ export const createCart = async (req, res, next) => {
     try {
         const usrId = new mongoose.Types.ObjectId(req.user.id)        
         
-        
         const {products, customer, totalPrice, branch, tableNumber, orderType} = req.body
-        
-        
         
         const cartCreado = await cartsService.createCart(usrId, { products }, customer, totalPrice, branch, tableNumber, orderType)
         

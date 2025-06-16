@@ -2,11 +2,13 @@ import { Router} from "express";
 import { createCart, deleteCartById, deleteProductCart, getCartById, getAllCarts, updProductQuant, getUserCarts, finPurchase, empyCart, addProdororQuantToCart, UpdateCartById, getCustomerCarts, UpdCartToCanceled, getTablesOccupied, getUserCartsInBranch, getAllUserCarts } from "../controllers/carts.controller.js";
 import { authMdw } from "../middlewares/auth.middleware.js";
 import { verifyAdminRoleMdw } from "../middlewares/verifyRole.middleware.js";
+import { validateSchema } from "../middlewares/validatorSchema.middleware.js";
+import { createCartsSchema } from "../validations/carts/create.schema.js";
 
 
 const router = Router()
 
-router.post('/', authMdw, createCart)
+router.post('/', authMdw, validateSchema(createCartsSchema), createCart)
 
 router.get('/', authMdw, verifyAdminRoleMdw, getAllCarts)
 
