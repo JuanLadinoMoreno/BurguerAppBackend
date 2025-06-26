@@ -286,8 +286,10 @@ export class CartsService {
     }
 
     async UpdateCartById(cid, cart, totalPrice, orderType, tableNumber) {
+        console.log(cid, cart, totalPrice, orderType, tableNumber);
+        
 
-        if (!cid || !cart || !totalPrice || !orderType || !tableNumber) {
+        if (!cid || !cart || !totalPrice || !orderType ) {
             throw CustomError.createError({
                 name: 'DataError',
                 cause: '',

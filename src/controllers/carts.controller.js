@@ -106,8 +106,8 @@ export const getCartById = async (req, res, next) => {
 export const UpdateCartById = async (req, res, next) => {
     
     try {
-        // const usrId = new mongoose.Types.ObjectId(req.user.id)        
-        const {cart ,cid, totalPrice, orderType, tableNumber} = req.body
+        const cid = req.params.cid       
+        const {cart, totalPrice, orderType, tableNumber} = req.body
         
         
         const cartUpdated = await cartsService.UpdateCartById(cid, cart, totalPrice, orderType, tableNumber)

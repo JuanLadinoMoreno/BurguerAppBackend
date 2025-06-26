@@ -2,8 +2,9 @@ import { Router} from "express";
 import { createCart, deleteCartById, deleteProductCart, getCartById, getAllCarts, updProductQuant, getUserCarts, finPurchase, empyCart, addProdororQuantToCart, UpdateCartById, getCustomerCarts, UpdCartToCanceled, getTablesOccupied, getUserCartsInBranch, getAllUserCarts } from "../controllers/carts.controller.js";
 import { authMdw } from "../middlewares/auth.middleware.js";
 import { verifyAdminRoleMdw } from "../middlewares/verifyRole.middleware.js";
-import { validateSchema } from "../middlewares/validatorSchema.middleware.js";
+import { validateSchema, validateParams } from "../middlewares/validatorSchema.middleware.js";
 import { createCartsSchema } from "../validations/carts/create.schema.js";
+import { updateCartsSchema, idParamSchema } from "../validations/carts/update.schema.js";
 
 
 const router = Router()
@@ -31,10 +32,10 @@ router.get('/customer/:cuid', authMdw, getCustomerCarts)//
 router.get('/:cid', authMdw, getCartById)
 
 //Vaciar carrito
-router.put('/:cid', authMdw, empyCart)
+router.put('/:cid/empty', authMdw, empyCart)
 
 //Actualizar carrito
-router.put('/', authMdw, UpdateCartById)
+router.put('/:cid', authMdw, validateParams(idParamSchema), validateSchema(updateCartsSchema), UpdateCartById)
 
 //Actualizar carrito a cancelado
 router.put('/cancel/:cid', authMdw, UpdCartToCanceled)
