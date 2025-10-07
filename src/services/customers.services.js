@@ -53,9 +53,9 @@ export default class CustomersService {
         // }
     }
 
-    async getCustomers() {
+    async getCustomers(firstName, lastName, email) {
 
-        const customers = await customersDAO.getCustomers()
+        const customers = await customersDAO.getCustomers(firstName, lastName, email)
         if (!customers) {
             return CustomError.createError({
                 name: 'CustomerError',

@@ -11,9 +11,35 @@ import { nanoid } from 'nanoid'
 export default class CartsManager {
 
 
-    async getCarts() {
+    async getCarts(start, end , branch, status, code, customer , user) {
         try {
-            const carts = await cartModel.find().populate('products.pid').populate('customer').populate('user').populate('branch').sort({createdAt: -1});
+            const query = {};
+            if (start && end) {
+                query.createdAt = {
+                    $gte: new Date(start),
+                    $lte: new Date(end)
+                };
+            }
+            
+            if (code) {
+                query.code = code;
+            }
+
+            if (branch) {
+                query.branch = branch;
+            }
+
+            if (status) {
+                query.status = status
+            }
+
+            if (customer) {
+                query.customer = customer
+            }
+            if (user) {
+                query.customer = user
+            }
+            const carts = await cartModel.find(query).populate('products.pid').populate('customer').populate('user').populate('branch').sort({createdAt: -1});
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');
             // console.log('datos', productos)
             // return datos
@@ -24,9 +50,32 @@ export default class CartsManager {
         }
     }
 
-    async getUserCarts(usrId) {
+    async getUserCarts(usrId, start, end, branch, status, code) {
         try {
-            const carts = await cartModel.find({ user: usrId, status: "created" }).populate('products.pid').populate('user').populate('customer').populate('branch').sort({createdAt: -1})
+            // Construimos el query dinámico
+            const query = { user: usrId };
+
+            
+            // Filtro por fechas (solo si ambos vienen)
+            if (start && end) {
+                query.createdAt = {
+                    $gte: new Date(start),
+                    $lte: new Date(end)
+                };
+            }
+            
+            if (code) {
+                query.code = code
+            }
+            if (status) {
+                query.status = status
+            }
+
+            if (branch) {
+                query.branch = branch;
+            }
+            
+            const carts = await cartModel.find(query).populate('products.pid').populate('user').populate('customer').populate('branch').sort({createdAt: -1})
             // const carts = await cartModel.find().populate('products.pid')//.populate('user');
             // console.log('datos', productos)
             // return datos
@@ -338,7 +387,7 @@ export default class CartsManager {
         }
     }
 
-    async saveTicket(uid, customer, cid, productsSell, cantidadTotal) {
+    async saveTicket(uid, customer, cid, productsSell, cantidadTotal, branch) {
         try {
             const tiket = new ticketModel({
                 code: nanoid(6), // Generar un código único para la compra
@@ -347,6 +396,7 @@ export default class CartsManager {
                 cart: cid,
                 productsSell,
                 amount: cantidadTotal,
+                branch
                 // purchaser: userEmail // Suponiendo que el usuario tiene un campo `email`
             });
     

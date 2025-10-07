@@ -6,9 +6,9 @@ const ticketsDAO = new TicketsDAO()
 
 export default class TicketsServices{
 
-    async getTickets() {
+    async getTickets(code, user, customer, branch, start, end) {
     
-        const tickets = await ticketsDAO.getTickets()
+        const tickets = await ticketsDAO.getTickets(code, user, customer, branch, start, end)
         if (!tickets) {
             throw CustomError.createError({
                 name: 'TicketsProblem',
@@ -89,6 +89,7 @@ export default class TicketsServices{
     
     async getSalesForCategoryMonth(anio, branch, category) {
         
+        const fechaActual = new Date();
         const anioBuscar = anio.getUTCFullYear() || fechaActual.getUTCFullYear();
 
         const inicio = new Date(anioBuscar, 0, 1);
@@ -110,6 +111,32 @@ export default class TicketsServices{
                 name: 'SalesProblem',
                 cause: '',
                 message: 'Problema al obtener ventas por año - sucuarsal - categoria',
+                code: ErrorCodes.NOT_FOUND
+            })
+
+        }
+        return tickets
+    
+    }
+
+    async getTopSellerProduct(start, end, branch, limit) {
+
+        if (!limit || limit < 0) {
+            throw CustomError.createError({
+                name: 'FieldsProblem',
+                cause: '',
+                message: 'Verifique que el limite exista y sea mayor a cero',
+                code: ErrorCodes.MISSING_REQUIRED_FIELDS
+            })
+
+        }
+
+        const tickets = await ticketsDAO.getTopSellerProduct(start, end, branch, limit)
+        if (!tickets) {
+            throw CustomError.createError({
+                name: 'SalesProblem',
+                cause: '',
+                message: 'Problema al obtener top seller products',
                 code: ErrorCodes.NOT_FOUND
             })
 

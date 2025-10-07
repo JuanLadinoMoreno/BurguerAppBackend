@@ -4,17 +4,38 @@ import ticketModel from "./models/ticket.model.js";
 
 export default class TicketsDAO {
 
-    async getTickets() {
+    async getTickets(code, user, customer, branch, start, end) {
         try {
-            return await ticketModel.find()
+          const query = {};
+          
+          if (start && end) {
+            query.purchase_datetime = {
+              $gte: new Date(start),
+              $lte: new Date(end)
+            };
+          }
+
+          if (code) {
+            query.code = code
+          }
+          
+          if (user) {
+            query.user = user
+          }
+
+          if (customer) {
+            query.customer = customer
+          }
+
+          if (branch) {
+            query.branch = branch;
+          }
+            return await ticketModel.find(query)
                                     .populate('user')
                                     .populate('customer')
+                                    .populate('branch')
                                     .populate({
                                       path: 'cart',
-                                      populate: {
-                                        path: 'branch',
-                                        model: 'Branch'
-                                      }
                                     })
                                     .populate({
                                         path: 'productsSell.pid',
@@ -305,5 +326,63 @@ export default class TicketsDAO {
             return null
         }
     }
+    
+  async getTopSellerProduct(start, end, branch, limit) {
+    try {
+      const lim = !limit ? 10 : limit 
+      const filters = {};
+      if (branch) {
+        filters.branch = branch;
+      }
+
+      if (start && end) {
+        filters.purchase_datetime = {
+          $gte: new Date(start),
+          $lt: new Date(end),
+        };
+      }
+
+      const sales = await ticketModel.aggregate([
+
+        [
+          { $match: filters },
+          { $unwind: "$productsSell" },
+          {
+            $group: {
+              _id: "$productsSell.pid",
+              totalQuantity: { $sum: "$productsSell.quantity" },
+              totalSales: { $sum: "$amount" },
+            },
+          },
+          { $sort: { totalQuantity: -1 } },
+          {
+            $lookup: {
+              from: "products",
+              localField: "_id",
+              foreignField: "_id",
+              as: "productDetails",
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              totalSales: 1,
+              totalQuantity: 1,
+              name: { $arrayElemAt: ["$productDetails.nombre", 0] },
+            },
+          },
+          { $limit:  parseInt(lim)},
+        ]
+
+
+      ]);
+
+      return sales;
+
+    } catch (error) {
+      console.log('Error on get sales fom month', error);
+      return null
+    }
+  }
 
 }

@@ -5,7 +5,8 @@ const branchService = new BranchService()
 export const getBranch = async (req, res) => {
     
     try {
-        const branch = await branchService.getBranch();
+        const {name} = req.query 
+        const branch = await branchService.getBranch(name);
         if (!branch) return res.status(404).json({ status: 'error', message: 'Sucursales no encontradas' })
 
         res.status(200).json({ status: 'success', payload: branch })

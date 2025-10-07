@@ -8,9 +8,9 @@ const branchDAO = new BranchDAO()
 export class BranchService {
 
 
-    async getBranch() {
+    async getBranch(name) {
 
-        const branch = await branchDAO.getBranch();
+        const branch = await branchDAO.getBranch(name);
         if (!branch) {
             return CustomError.createError({
                 name: "ProductsNotFoundError",

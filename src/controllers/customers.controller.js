@@ -7,7 +7,6 @@ export const register = async (req, res, next) => {
     try {        
 
         const { firstName, lastName, phone, email } = req.body
-        console.log(firstName, lastName, phone, email);
         
 
         const userFound = await customersService.createCustomer(firstName, lastName, phone, email)
@@ -32,7 +31,8 @@ export const register = async (req, res, next) => {
 
 export const getCustomers = async (req, res, next) => {
     try {
-        const customers = await customersService.getCustomers();
+        let { firstName, lastName, email} = req.query      
+        const customers = await customersService.getCustomers(firstName, lastName, email);
         res.status(200).json({ status: 'success', payload: customers })
     } catch (error) {
         console.log(error);

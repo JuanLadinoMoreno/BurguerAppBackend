@@ -102,9 +102,22 @@ export default class usersDAO{
         }
     }
 
-    async getUsers() {
+    async getUsers(firstName, lastName, email) {
         try {
-            const users = await userModel.find();
+            const query = {}
+            
+            if (firstName) {
+                query.firstName = { $regex: new RegExp(`^${firstName}$`, "i") }
+            }
+
+            if (lastName) {
+                query.lastName = { $regex: new RegExp(`^${lastName}$`, "i") }
+            }
+
+            if (email) {
+                query.email =  email 
+            }
+            const users = await userModel.find(query).populate('branch')
             return users
         } catch (error) {
             console.log(error);

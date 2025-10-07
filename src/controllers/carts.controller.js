@@ -29,8 +29,8 @@ export const createCart = async (req, res, next) => {
 export const getAllCarts = async (req, res) => {
     try {
 
-        let limit = +req.query.limit
-        const carts = await cartsService.getAllCarts()
+        let { limit, start, end , branch, status, code, customer, user} = req.query
+        const carts = await cartsService.getAllCarts(start, end , branch, status, code, customer, user )
         if (limit > 0) return res.json(carts.slice(0, limit))
         res.json({status: 'succes', payload: carts})
 
@@ -45,9 +45,9 @@ export const getUserCarts = async (req, res, next) => {
     try {
         
         const usrId = req.params.uid
+        const { start, end, branch, status, limit, code } = req.query;
 
-        let limit = +req.query.limit
-        const carts = await cartsService.getUserCarts(usrId)
+        const carts = await cartsService.getUserCarts(usrId, start, end, branch, status, code)
         if (limit > 0) return res.json({status: 'success', payload: carts.slice(0, limit)} )
         res.json({status: 'success', payload: carts})
 

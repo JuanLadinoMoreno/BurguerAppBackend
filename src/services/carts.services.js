@@ -20,7 +20,7 @@ export class CartsService {
     async createCart(idUser, cart, customer, totalPrice, branch, tableNumber, orderType) {
 
         // try {
-        if (!idUser || !cart || !totalPrice || !branch || !orderType) {
+        if (!idUser || !cart || !totalPrice || !branch || !orderType ) {
             throw CustomError.createError({
                 name: 'CartDataError',
                 cause: '',
@@ -99,7 +99,8 @@ export class CartsService {
             }
         }
 
-        const cartUsr = { ...cart, user: idUser, status: 'created', customer, totalPrice, branch, tableNumber, orderType }
+        const code = Math.floor(Math.random() * 1000000);
+        const cartUsr = { ...cart, user: idUser, status: 'created', customer, totalPrice, branch, tableNumber, orderType, code}
 
 
 
@@ -117,9 +118,9 @@ export class CartsService {
     }
 
 
-    async getAllCarts() {
+    async getAllCarts(start, end , branch, status, code, customer, user ) {
 
-        const carts = await cartsDAO.getCarts()
+        const carts = await cartsDAO.getCarts(start, end , branch, status, code, customer, user )
         if (!carts)
             throw CustomError.createError({
                 name: 'CartsNotFoundError',
@@ -130,7 +131,7 @@ export class CartsService {
         return carts
     }
 
-    async getUserCarts(uid) {
+    async getUserCarts(uid, start, end, branch, status, code) {
 
         if (!uid)
             throw CustomError.createError({
@@ -148,7 +149,7 @@ export class CartsService {
                 message: 'El usuario no existe',
                 code: ErrorCodes.NOT_FOUND
             })
-        const carts = await cartsDAO.getUserCarts(uid)
+        const carts = await cartsDAO.getUserCarts(uid, start, end, branch, status, code)
         if (!carts)
             throw CustomError.createError({
                 name: 'UserError',
@@ -621,7 +622,7 @@ export class CartsService {
 
         //Crae tiket en BD
         const customer = !cart.customer ? null : cart.customer._id
-        const ticket = cartsDAO.saveTicket(cart.user._id, customer, cid, cart.products, cart.totalPrice)
+        const ticket = cartsDAO.saveTicket(cart.user._id, customer, cid, cart.products, cart.totalPrice, cart.branch._id)
         // uid, customer, cid, productsSell, cantidadTotal
         if (!ticket)
             return CustomError.createError({

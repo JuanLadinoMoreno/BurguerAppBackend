@@ -80,5 +80,9 @@ export const createCartsSchema = z.object({
     orderType: z.string({
         required_error: "Tipo de orden es requerida",
         invalid_type_error: "Tipo de orden debe ser un string",
+    }),
+    code: z.string({
+        required_error: "Código de orden es requerida",
+        invalid_type_error: "Código de orden debe ser un string",
     })
 });

@@ -59,9 +59,23 @@ export default class CustomersDAO{
         }
     }
 
-    async getCustomers() {
+    async getCustomers(firstName, lastName, email) {
         try {
-            return await customerModel.find();
+            const query = {};
+            
+            if (firstName) {
+                query.firstName = { $regex: new RegExp(`^${firstName}$`, "i") };;
+            }
+
+            if (lastName) {
+                query.lastName = { $regex: new RegExp(`^${lastName}$`, "i") };
+            }
+
+            if (email) {
+                query.email = email
+            }
+            const customers = await customerModel.find(query);
+            return customers.map(p => p.toObject({ virtuals: true }))
              
         } catch (error) {
             console.log('Error on login', e);

@@ -132,7 +132,8 @@ export const verifyToken = async (req, res) => {
 
 export const getUsers = async (req, res, next) => {
     try {
-        const users = await usersService.getUsers();
+        const { firstName, lastName, email } = req.query
+        const users = await usersService.getUsers(firstName, lastName, email);
         res.status(200).json({ status: 'success', payload: users })
     } catch (error) {
         console.log(error);

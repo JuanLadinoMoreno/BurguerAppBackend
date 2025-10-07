@@ -159,9 +159,9 @@ export default class usersService {
         return userUpdDTO
     }
 
-    async getUsers() {
+    async getUsers(firstName, lastName, email) {
 
-        const users = await UsersDAO.getUsers()
+        const users = await UsersDAO.getUsers(firstName, lastName, email)
         if (!users) {
             throw CustomError.createError({
                 name: 'UsersNotFound',

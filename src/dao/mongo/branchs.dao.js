@@ -3,9 +3,13 @@ import userModel from "./models/user.model.js";
 
 export default class BranchDAO{
 
-    async getBranch() {
+    async getBranch(name) {
         try {
-            const productos = await branchModel.find().sort({"createdAt": -1});
+            const query = {}
+            if(name){
+                query.name = { $regex: new RegExp(`^${name}$`, "i") }
+            }
+            const productos = await branchModel.find(query).sort({"createdAt": -1});
             return productos.map(p => p.toObject({ virtuals: true }))
 
         } catch (error) {

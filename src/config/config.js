@@ -12,3 +12,10 @@ export const GMAIL_ACCOUNT = process.env.GMAIL_ACCOUNT
 export const GMAIL_PASSWORD = process.env.GMAIL_PASSWORD
 
 export const FRONTEND_URL = process.env.FRONTEND_URL;
+
+export const SK_ENV_URL = process.env.SK_ENV_URL || ''
+export const SK_CLIENT_ID = process.env.SK_CLIENT_ID || ''
+export const SK_CLIENT_SECRET = process.env.SK_CLIENT_SECRET || ''
+export const PROTECTED_RESOURCE_METADATA = JSON.parse(process.env.PROTECTED_RESOURCE_METADATA) || {}
+export const BASE_URL_MCP = process.env.BASE_URL_MCP
+export const PORT_MCP = Number(process.env.PORT_MCP) || ''

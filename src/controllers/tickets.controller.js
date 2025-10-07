@@ -5,7 +5,8 @@ const ticketsServices = new TicketsServices()
 
 export const getTickets = async (req, res, next) => {
     try {
-        const tickets = await ticketsServices.getTickets();
+        let {  code, user, customer, branch, start, end } = req.query
+        const tickets = await ticketsServices.getTickets(code, user, customer, branch, start, end);
         if(!tickets) return res.json({status: 'error', message: 'Tickets null'})
 
         res.status(200).json({ status: 'success', payload: tickets })
@@ -66,7 +67,18 @@ export const getSalesForCategoryMonth = async (req, res, next) => {
         res.status(200).json({ status: 'success', payload: sales })
     } catch (error) {
         console.log(error);
+        next(error)
+    }
+}
 
+export const getTopSellerProduct = async (req, res, next) => {
+    try {
+        const {start, end, branch, limit} = req.query
+        const branchId = new mongoose.Types.ObjectId(branch)
+        const sales = await ticketsServices.getTopSellerProduct(start, end, branchId, limit)
+        res.status(200).json({ status: 'success', payload: sales })
+    } catch (error) {
+        console.log(error);
         next(error)
     }
 }

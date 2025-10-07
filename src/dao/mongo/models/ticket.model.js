@@ -31,6 +31,11 @@ const ticketSchema = new Schema(
             type: [],
             required: true
         },
+        branch: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Branch',
+            required: true,
+        },
         // productsSell: [
         //     {
         //         product: {

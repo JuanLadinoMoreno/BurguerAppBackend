@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@scalekit-sdk/node": "^2.1.2",
     "bcryptjs": "^2.4.3",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",

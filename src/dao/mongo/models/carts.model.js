@@ -87,6 +87,11 @@ const cartsSchema = new Schema({
         type: String,
         required: true,
     },
+    code: {
+        type: String,
+        required: true,
+        unique: true
+    },
 },
     {
         timestamps: true,
