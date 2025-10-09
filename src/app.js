@@ -91,7 +91,7 @@ const manin = async => {
     connectMDb()
 
     app.listen(PORT, () => {
-        console.log('Servidor preparado!!');
+        console.log(`Servidor preparado en puerto ${PORT}`);
     });
 
 }
