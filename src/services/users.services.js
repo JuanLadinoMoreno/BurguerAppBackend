@@ -184,7 +184,7 @@ export default class usersService {
             })
         }
 
-        await this.findUserById(userId);
+        const userFound = await this.findUserById(userId);
 
         const lastConnection = moment(userFound.lastConnection);
 

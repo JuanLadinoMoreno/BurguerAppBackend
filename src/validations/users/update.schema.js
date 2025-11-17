@@ -15,13 +15,13 @@ export const updateUserSchema = z.object({
         .number({
             required_error: "Age is required",
         }),
-    email: z
-        .string({
-            required_error: "Email is required zod",
-        })
-        .email({
-            message: "Invalid email zod",
-        }),
+    // email: z
+    //     .string({
+    //         required_error: "Email is required zod",
+    //     })
+    //     .email({
+    //         message: "Invalid email zod",
+    //     }),
     // password: z
     //     .string({
     //         required_error: "Username is required zod"

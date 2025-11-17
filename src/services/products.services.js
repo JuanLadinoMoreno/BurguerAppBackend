@@ -60,6 +60,7 @@ export class ProductsService {
             })
 
             const product = await productsDAO.findProductById(id)
+            console.log('product----------', product)
             if(!product){
 
                 throw CustomError.createError({

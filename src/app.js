@@ -2,6 +2,7 @@
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
+import  swaggerUI  from "swagger-ui-express";
 
 import { PORT } from './config/config.js';
 
@@ -22,6 +23,7 @@ import { connectMDb } from '../src/config/database.js';
 import 'dotenv/config'
 import path from 'path'
 import { fileURLToPath } from 'url';
+import specs from './config/swagger.js';
 
 // const PORT = process.env.PORT;
 
@@ -31,19 +33,29 @@ const app = express();
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
 
-app.use(express.urlencoded({ extended: true }))
+// app.use(cors())
+app.use(cors({
+    origin: '*',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}))
+
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
 
 app.use(express.static('public'))
 // app.use(express.static(path.join(__dirname, 'public')));
 
 
-// app.use(cors())
-app.use(cors({
-    origin: 'http://localhost:5173',
-    // origin: '*',
-    credentials: true
-}))
+app.use('/api-docs', swaggerUI.serve);
+app.use('/api-docs', swaggerUI.setup(specs, {
+    swaggerOptions: {
+        persistAuthorization: true,
+        tryItOutEnabled: true
+    }
+}));
 
 // const allowedOrigins = [
 //     'http://127.0.0.1:5173',  // Local
@@ -65,7 +77,6 @@ app.use(cors({
 // }));
 
 
-app.use(cookieParser())
 
 app.use('/api/products', productsRouter)
 app.use('/api/categories', categoriesRouter)

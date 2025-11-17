@@ -29,6 +29,8 @@
     "nodemailer": "^6.9.14",
     "react-leaflet": "^4.2.1",
     "socket.io": "^4.7.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "zod": "^3.25.49"
   },
   "devDependencies": {

@@ -25,11 +25,16 @@ export const getProductById = async (req, res) => {
     try {
         const id = req.params.id
         const product = await productService.findProductById(id)
+        console.log('product', product)
         if (!product) {
             return res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
         }
         res.status(200).json({status: 'success', payload: product})
     } catch (error) {
+        console.log('ksdljkfhsjkdhfakjgdfgkjhgk g');
+        if (error.code === 7) {
+            return res.status(404).json({ status: 'error', message: error.message });
+        } 
         return res.status(500).json({status: error, message: error.message });
     }
 

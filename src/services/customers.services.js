@@ -91,7 +91,7 @@ export default class CustomersService {
             })
         }
 
-        const customerDTO = new customersDto(userFound)
+        const customerDTO = new customersDto(customerFound)
         return customerDTO
     }
 
