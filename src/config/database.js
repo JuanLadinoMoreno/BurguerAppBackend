@@ -5,9 +5,9 @@ import { NOTES_APP_MONGODB_DATABASE, NOTES_APP_MONGODB_HOST, URL_MONGO_DBATLAS }
 export const connectMDb = async () => {
 
 
-    const MONGODB_URI = `mongodb://localhost:27017/BurguerRobles`//local
+    // const MONGODB_URI = `mongodb://localhost:27017/BurguerRobles`//local
 
-    // const MONGODB_URI = `mongodb+srv://${NOTES_APP_MONGODB_HOST}.8wuolks.mongodb.net/${NOTES_APP_MONGODB_DATABASE}` //atlas
+    const MONGODB_URI = `mongodb+srv://${NOTES_APP_MONGODB_HOST}.8wuolks.mongodb.net/${NOTES_APP_MONGODB_DATABASE}` //atlas
 
     try {
         await mongoose.connect(MONGODB_URI);
