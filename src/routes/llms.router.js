@@ -453,7 +453,7 @@ import { getAllCarts, getCartById, getUserCarts } from "../controllers/carts.con
 
 const router = Router()
 //USUERS
-router.get('/users', llmAuthMdw(['usr:read']), getUsers)
+router.get('/users', getUsers)
 router.post('/users', llmAuthMdw(['usr:write']), verifyLlmAdminRole, validateSchema(registerSchema), register)
 
 //PRODUCTS

@@ -31,6 +31,11 @@ export const authMdw = (req, res, next) => {
 
   // ========== MIDDLEWARE PARA LLMs (SCALEKIT) ==========
 export const llmAuthMdw = (requiredScopes) => {
+  console.log('entrando a llmAuthMdw con scopes:', requiredScopes);
+  console.log('BASE_URL_MCP:', BASE_URL_MCP);
+  console.log('PORT_MCP:', PORT_MCP);
+  console.log('SK_ENV_URL:', SK_ENV_URL);
+
   return async (req, res, next) => {
     try {
       const authHeader = req.headers.authorization;
@@ -44,7 +49,7 @@ export const llmAuthMdw = (requiredScopes) => {
 
       // Validar token con Scalekit
       const validateOptions = { 
-        audience: [`${BASE_URL_MCP}:${PORT_MCP}/`] 
+        audience: [`${BASE_URL_MCP}/`] 
       };
       
       
@@ -54,10 +59,11 @@ export const llmAuthMdw = (requiredScopes) => {
       }
 
       const decodedToken = await scalekit.validateToken(token, validateOptions);
+      console.log('decodedToken', decodedToken)
       // Verificar scopes manualmente si es necesario
       if (requiredScopes.length > 0) {
         const hasAllScopes = requiredScopes.every(scope => 
-          decodedToken.scopes?.includes(scope)
+          decodedToken.permissions?.includes(scope)
         );
         
         if (!hasAllScopes) {
