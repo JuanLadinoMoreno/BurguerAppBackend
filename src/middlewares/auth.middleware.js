@@ -54,17 +54,22 @@ export const llmAuthMdw = (requiredScopes) => {
       
       
       // Si se requieren scopes específicos
-      if (requiredScopes.length > 0) {
-        validateOptions.requiredScopes = requiredScopes;
-      }
+      // if (requiredScopes.length > 0) {
+      //   validateOptions.requiredScopes = requiredScopes;
+      // }
 
       const decodedToken = await scalekit.validateToken(token, validateOptions);
       console.log('decodedToken', decodedToken)
       // Verificar scopes manualmente si es necesario
       if (requiredScopes.length > 0) {
-        const hasAllScopes = requiredScopes.every(scope => 
-          decodedToken.permissions?.includes(scope)
+        const permissions = decodedToken.permissions || [];
+        const hasAllScopes = requiredScopes.every(perm => 
+          permissions.includes(perm)
         );
+
+        // const hasAllScopes = requiredScopes.every(scope => 
+        //   decodedToken.permissions?.includes(scope)
+        // );
         
         if (!hasAllScopes) {
           return res.status(403).json({ 
